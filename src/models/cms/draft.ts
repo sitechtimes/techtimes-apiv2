@@ -6,6 +6,7 @@ interface DraftAttrs {
   title: string;
   content: string;
   userId: string;
+  customAuthor?: string;
 }
 
 interface DraftModel extends mongoose.Model<DraftDoc> {
@@ -16,6 +17,7 @@ export interface DraftDoc extends mongoose.Document {
   title: string;
   content: string;
   userId: string;
+  customAuthor?: string;
   imageUrl: string;
   imageAlt: string;
   status: DraftStatus;
@@ -27,6 +29,19 @@ const draftSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: String,
+      required: true,
+    },
+    customAuthor: {
+      type: String,
+      default: null,
+      required: false,
     },
     imageUrl: {
       type: String,
@@ -44,18 +59,10 @@ const draftSchema = new mongoose.Schema(
       required: true,
       default: DraftStatus.Draft,
     },
-    content: {
-      type: String,
-      required: true,
-    },
     category: {
       type: String,
       enum: Object.values(Category),
       default: Category.Technology,
-      required: true,
-    },
-    userId: {
-      type: String,
       required: true,
     },
   },

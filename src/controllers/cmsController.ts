@@ -9,6 +9,7 @@ import { DraftStatus } from "../models/cms/draftStatus";
 import { Role } from "../models/role";
 import sanitize from "sanitize-html";
 import { spawn } from "child_process";
+import { User } from "../models/user";
 
 async function categories(req: Request, res: Response) {
   const categories = Object.values(Category);
@@ -34,6 +35,8 @@ async function index(req: Request, res: Response) {
 }
 
 async function newArticle(req: Request, res: Response) {
+  const user = await User.findById(req.currentUser!.id);
+
   const draft = Draft.build({
     title: "Untitled",
     content: "This is where you should write the content of your article ...",
@@ -61,6 +64,7 @@ async function publish(req: Request, res: Response) {
   const attrs = {
     title: draft.title,
     content: draft.content,
+    customAuthor: draft.customAuthor,
     imageUrl: draft.imageUrl,
     imageAlt: draft.imageAlt,
     category: draft.category,
@@ -164,12 +168,15 @@ async function update(req: Request, res: Response) {
   if (draft.userId == req.currentUser!.id) {
     // TODO - refactor update logic
     function isEmpty(thing: any) {
-      return thing.toString().trim().length === 0;
+      return String(thing).trim().length === 0;
     }
 
     // these are required!!!! do not let them be empty!!
     const title = isEmpty(req.body.title) ? draft.title : sanitize(req.body.title);
     const content = isEmpty(req.body.content) ? draft.content : sanitize(req.body.content);
+    const customAuthor = isEmpty(req.body.customAuthor)
+      ? draft.customAuthor
+      : req.body.customAuthor;
 
     // editors can only send to review
     const status = req.body.status == DraftStatus.Review ? req.body.status : draft.status;
@@ -181,7 +188,7 @@ async function update(req: Request, res: Response) {
     const imageUrl = req.body.imageUrl == undefined ? draft.imageUrl : req.body.imageUrl; // cms doesn't actually support removing an image?
     const imageAlt = req.body.imageAlt == undefined ? draft.imageAlt : req.body.imageAlt; // alt can be nuked though
 
-    draft.set({ title, content, status, imageUrl, imageAlt, category });
+    draft.set({ title, content, customAuthor, status, imageUrl, imageAlt, category });
   }
 
   // editor - can move to ready and back to draft

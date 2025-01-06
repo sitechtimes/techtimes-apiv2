@@ -23,6 +23,7 @@ interface ArticleModel extends mongoose.Model<ArticleDoc> {
 export interface ArticleDoc extends mongoose.Document {
   title: string;
   content: string;
+  customAuthor: string;
   imageUrl: string;
   imageAlt?: string;
   category: Category;
@@ -42,24 +43,13 @@ const articleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    imageUrl: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    imageAlt: {
-      type: String,
-      default: null,
-      required: false,
-    },
     content: {
       type: String,
       required: true,
     },
-    category: {
+    customAuthor: {
       type: String,
-      enum: Object.values(Category),
-      required: true,
+      required: false,
     },
     user: {
       id: {
@@ -74,6 +64,21 @@ const articleSchema = new mongoose.Schema(
         type: String,
         required: false,
       },
+    },
+    imageUrl: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    imageAlt: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    category: {
+      type: String,
+      enum: Object.values(Category),
+      required: true,
     },
     slug: {
       type: String,
