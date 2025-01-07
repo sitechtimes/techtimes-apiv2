@@ -64,7 +64,7 @@ async function signIn(req: Request, res: Response) {
     role: existingUser.role,
   };
 
-  const userJWT = jwt.sign(payload, process.env.JWT_KEY!);
+  const userJWT = jwt.sign(payload, process.env.JWT_KEY!, { expiresIn: "6h" });
 
   req.session = {
     jwt: userJWT,
