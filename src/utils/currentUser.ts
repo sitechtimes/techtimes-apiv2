@@ -24,7 +24,8 @@ export const currentUser = (req: Request, res: Response, next: NextFunction) => 
     const payload = jwt.verify(req.headers.authorization, process.env.JWT_KEY!) as UserPayload;
     req.currentUser = payload;
   } catch (err) {
-    res.status(500).json({ message: "krill issue" });
+    req.session = null;
+    res.status(401).json({ message: "you are invalid" });
     return;
   }
 

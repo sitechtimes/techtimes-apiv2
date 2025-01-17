@@ -1,8 +1,69 @@
 import { Request, Response } from "express";
 import { User } from "../models/user";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
+
+const emailCooldown = 60; // email verification cooldown
+
+async function sendVerification(req: Request, res: Response) {
+  if (!req.currentUser) return res.status(401).json({ message: "Invalid credentials" });
+  const { email } = req.currentUser;
+
+  const existingUser = await User.findOne({ email });
+  if (!existingUser) return res.status(401).json({ message: "Invalid credentials" });
+
+  if (existingUser.verified) return res.status(200).json({ verified: true });
+
+  if (existingUser.verificationCode) {
+    const existingCode = jwt.decode(existingUser.verificationCode) as JwtPayload;
+    existingCode.iat ??= 0;
+    const cooldown = Date.now() / 1000 - existingCode.iat; // seconds since the last email was sent
+
+    if (!req.body.newToken)
+      return res
+        .status(201)
+        .json({ message: "check in", time: Math.max(Math.ceil(emailCooldown - cooldown), 0) });
+
+    if (cooldown < emailCooldown)
+      return res.status(429).json({
+        message: "email machine on cooldown",
+        time: Math.ceil(emailCooldown - cooldown),
+      });
+  }
+
+  if (!req.body.newToken && existingUser.verificationCode)
+    return res.status(201).json({ message: "check in", time: 0 });
+
+  const verificationToken = jwt.sign({ email }, process.env.JWT_KEY!, {
+    expiresIn: "20m",
+  });
+
+  existingUser.verificationCode = verificationToken;
+  await existingUser.save();
+
+  const transport = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    // TODO: is this supposed to be false??
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  let mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email.toString(),
+    subject: "TechTimes Email confirmation",
+    html: `Hello there, click the following link to verify your email: <a href="${process.env.URL}:8000/auth/verify/${verificationToken}">Verify Email</a>`,
+  };
+
+  await transport.sendMail(mailOptions);
+
+  return res.status(201).json({ message: "verify email", time: emailCooldown });
+}
 
 async function signUp(req: Request, res: Response) {
   const { name, email, password } = req.body;
@@ -11,41 +72,18 @@ async function signUp(req: Request, res: Response) {
     return res.status(409).json({ message: "user already exists" });
 
   try {
-    const verificationToken = jwt.sign({ email }, process.env.JWT_KEY!, { expiresIn: "20m" });
-
     const newUser = await User.create({
       name,
       email,
       password,
-      verified: false,
-      verificationCode: verificationToken,
     });
+
     await newUser.save();
 
-    const transport = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      // TODO: is this supposed to be false??
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    let mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email.toString(),
-      subject: "TechTimes Email confirmation",
-      html: `Hello there, click the following link to verify your email: <a href="${process.env.URL}:8000/auth/verify/${verificationToken}">Verify Email</a>`,
-    };
-
-    await transport.sendMail(mailOptions);
-
-    res.status(201).json({ message: "verify email" });
+    return res.status(200).json();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "error" });
+    return res.status(500).json({ message: "error" });
   }
 }
 
@@ -88,13 +126,14 @@ async function verify(req: Request, res: Response) {
 
   if (!user) return res.status(401).json({ message: "Invalid token" });
 
-  if (!process.env.JWT_KEY) return res.status(500).json({ message: "krill issue" });
+  if (!process.env.JWT_KEY) return res.status(500).json({ message: "krill issue 1" });
 
   try {
     jwt.verify(token, process.env.JWT_KEY);
   } catch {
     return res.status(401).json({ message: "Invalid token" });
   }
+  user.verificationCode = undefined;
   user.verified = true;
   await user.save();
 
@@ -117,4 +156,4 @@ async function currentUser(req: Request, res: Response) {
   res.send({ ...(req.currentUser || null) });
 }
 
-module.exports = { signUp, signIn, logout, verify, currentUser };
+module.exports = { sendVerification, signUp, signIn, logout, verify, currentUser };

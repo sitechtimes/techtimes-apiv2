@@ -53,7 +53,7 @@ async function publish(req: Request, res: Response) {
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
-  if (!mongoose.connection.db) return res.status(500).json({ message: "krill issue" });
+  if (!mongoose.connection.db) return res.status(500).json({ message: "krill issue 2" });
 
   const db = mongoose.connection.db.collection("users");
 
