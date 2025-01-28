@@ -126,7 +126,7 @@ async function verify(req: Request, res: Response) {
 
   if (!user) return res.status(401).json({ message: "Invalid token" });
 
-  if (!process.env.JWT_KEY) return res.status(500).json({ message: "krill issue 1" });
+  if (!process.env.JWT_KEY) return res.status(500).json({ message: "krill issue" });
 
   try {
     jwt.verify(token, process.env.JWT_KEY);

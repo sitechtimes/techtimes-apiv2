@@ -53,7 +53,7 @@ async function publish(req: Request, res: Response) {
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
-  if (!mongoose.connection.db) return res.status(500).json({ message: "krill issue 2" });
+  if (!mongoose.connection.db) return res.status(500).json({ message: "krill issue" });
 
   const db = mongoose.connection.db.collection("users");
 
@@ -182,7 +182,11 @@ async function update(req: Request, res: Response) {
     const status = req.body.status == DraftStatus.Review ? req.body.status : draft.status;
 
     // editors can change article category
-    const category = req.body.category == undefined ? draft.category : req.body.category;
+    // will CRASH AND BURN if it's not valid enum. just kinda ignore them if it's invalid
+    const category =
+      req.body.category == undefined || !Object.values(Category).includes(req.body.category)
+        ? draft.category
+        : req.body.category;
 
     // not required whatever
     const imageUrl = req.body.imageUrl == undefined ? draft.imageUrl : req.body.imageUrl; // cms doesn't actually support removing an image?
