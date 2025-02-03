@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 import cors from "cors";
 app.use(
   cors({
-    origin: [process.env.URL + ":8089", process.env.URL + ":8000"],
+    origin: [process.env.URL + ":8089", process.env.URL + ":8000", "http://localhost:8089"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     optionsSuccessStatus: 200, // compatibility or something. blame ie11
