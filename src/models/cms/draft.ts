@@ -42,6 +42,7 @@ const draftSchema = new mongoose.Schema(
       type: String,
       default: null,
       required: false,
+      trim: true,
     },
     imageUrl: {
       type: String,
@@ -52,6 +53,7 @@ const draftSchema = new mongoose.Schema(
       type: String,
       default: null,
       required: false,
+      trim: true,
     },
     status: {
       type: String,

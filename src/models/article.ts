@@ -42,6 +42,7 @@ const articleSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
     content: {
       type: String,
@@ -50,6 +51,7 @@ const articleSchema = new mongoose.Schema(
     customAuthor: {
       type: String,
       required: false,
+      trim: true,
     },
     user: {
       id: {
