@@ -16,9 +16,7 @@ declare global {
 }
 
 export const currentUser = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.headers.authorization) {
-    return next();
-  }
+  if (!req.headers.authorization) return next();
 
   try {
     const payload = jwt.verify(req.headers.authorization, process.env.JWT_KEY!) as UserPayload;

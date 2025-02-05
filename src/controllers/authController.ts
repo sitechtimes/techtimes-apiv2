@@ -15,6 +15,7 @@ async function sendVerification(req: Request, res: Response) {
 
   if (existingUser.verified) return res.status(200).json({ verified: true });
 
+  // I'VE SENT THIS CODE BEFORE!!
   if (existingUser.verificationCode) {
     const existingCode = jwt.decode(existingUser.verificationCode) as JwtPayload;
     existingCode.iat ??= 0;
@@ -31,9 +32,6 @@ async function sendVerification(req: Request, res: Response) {
         time: Math.ceil(emailCooldown - cooldown),
       });
   }
-
-  if (!req.body.newToken && existingUser.verificationCode)
-    return res.status(201).json({ message: "check in", time: 0 });
 
   const verificationToken = jwt.sign({ email }, process.env.JWT_KEY!, {
     expiresIn: "20m",
@@ -152,8 +150,4 @@ async function verify(req: Request, res: Response) {
   res.status(200).send({ ...user.toJSON(), token: userJWT });
 }
 
-async function currentUser(req: Request, res: Response) {
-  res.send({ ...(req.currentUser || null) });
-}
-
-module.exports = { sendVerification, signUp, signIn, logout, verify, currentUser };
+module.exports = { sendVerification, signUp, signIn, logout, verify };

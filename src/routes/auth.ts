@@ -35,6 +35,4 @@ router.post("/verify", authController.sendVerification);
 
 router.get("/verify/:token", authController.verify);
 
-router.get("/current-user", currentUser, authController.currentUser);
-
 module.exports = router;
