@@ -3,7 +3,6 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 import { body } from "express-validator";
 import { validateRequest } from "../utils/requestValidator";
-import { currentUser } from "../utils/currentUser";
 
 router.post(
   "/signup",
