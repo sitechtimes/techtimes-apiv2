@@ -12,26 +12,24 @@ async function sendVerification(req: Request, res: Response) {
 
   const existingUser = await User.findOne({ email });
   if (!existingUser) return res.status(401).json({ message: "Invalid credentials" });
-
   if (existingUser.verified) return res.status(200).json({ verified: true });
 
   // I'VE SENT THIS CODE BEFORE!!
   if (existingUser.verificationCode) {
     const existingCode = jwt.decode(existingUser.verificationCode) as JwtPayload;
     existingCode.iat ??= 0;
-    const cooldown = Date.now() / 1000 - existingCode.iat; // seconds since the last email was sent
+    const cooledDown = (existingCode.iat + emailCooldown) * 1000; // timestamp of when the cooldown ends. adjusted to work with date.now
 
-    if (!req.body.newToken)
-      return res
-        .status(201)
-        .json({ message: "check in", time: Math.max(Math.ceil(emailCooldown - cooldown), 0) });
+    if (!req.body.newToken) return res.status(201).json({ message: "check in", time: cooledDown });
 
-    if (cooldown < emailCooldown)
+    // check if the cooldown has ended
+    if (Date.now() / 1000 - existingCode.iat < emailCooldown)
       return res.status(429).json({
         message: "email machine on cooldown",
-        time: Math.ceil(emailCooldown - cooldown),
+        time: cooledDown,
       });
   }
+  // if newToken is false but the user doesn't have a verification code, send it anyway
 
   const verificationToken = jwt.sign({ email }, process.env.JWT_KEY!, {
     expiresIn: "20m",
@@ -60,7 +58,7 @@ async function sendVerification(req: Request, res: Response) {
 
   await transport.sendMail(mailOptions);
 
-  return res.status(201).json({ message: "verify email", time: emailCooldown });
+  return res.status(201).json({ message: "verify email", time: Date.now() + emailCooldown * 1000 });
 }
 
 async function signUp(req: Request, res: Response) {
