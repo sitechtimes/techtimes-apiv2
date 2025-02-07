@@ -101,10 +101,6 @@ const articleSchema = new mongoose.Schema(
 
 articleSchema.plugin(mongooseSlugPlugin, { tmpl: "<%=title%>" });
 
-articleSchema.statics.build = (attrs: ArticleAttrs) => {
-  return new Article(attrs);
-};
-
 const Article = mongoose.model<ArticleDoc, ArticleModel>("Article", articleSchema);
 
 export { articleSchema, Article };

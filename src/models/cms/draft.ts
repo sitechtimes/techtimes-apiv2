@@ -80,10 +80,6 @@ const draftSchema = new mongoose.Schema(
   }
 );
 
-draftSchema.statics.build = (attrs: DraftAttrs) => {
-  return new Draft(attrs);
-};
-
 const Draft = mongoose.model<DraftDoc, DraftModel>("Draft", draftSchema);
 
 export { draftSchema, Draft };
