@@ -78,8 +78,6 @@ const homepageSchema = new mongoose.Schema(
   }
 );
 
-homepageSchema.statics.build = (attrs: HomepageAttrs) => new Homepage(attrs);
-
 const Homepage = mongoose.model<HomepageDoc, HomepageModel>("Homepage", homepageSchema);
 
 export { homepageSchema, Homepage };

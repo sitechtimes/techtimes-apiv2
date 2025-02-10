@@ -9,7 +9,7 @@ import { DraftStatus } from "../models/cms/draftStatus";
 import { Role } from "../models/role";
 import sanitize from "sanitize-html";
 import { spawn } from "child_process";
-import { User } from "../models/user";
+import { forceValidCategory } from "../utils/forceValidCategory";
 
 async function categories(req: Request, res: Response) {
   const categories = Object.values(Category);
@@ -35,15 +35,13 @@ async function index(req: Request, res: Response) {
 }
 
 async function newArticle(req: Request, res: Response) {
-  const user = await User.findById(req.currentUser!.id);
-
-  const draft = Draft.build({
+  const draft = await Draft.create({
     title: "Untitled",
     content: "This is where you should write the content of your article ...",
     userId: req.currentUser!.id,
   });
 
-  await draft.save();
+  draft.save();
 
   res.status(201).send(draft);
 }
@@ -75,9 +73,17 @@ async function publish(req: Request, res: Response) {
     },
   };
 
-  const article = Article.build({ ...attrs });
+  const article = await Article.create(attrs);
+  // express validates stuff in a pre-save hook
+  // catch invalid categories
+  try {
+    await article.save();
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError)
+      if (error.errors.category.kind === "enum" && error.errors.category.path === "category")
+        await forceValidCategory(draft.id);
+  }
 
-  await article.save();
   await Draft.findByIdAndDelete(req.params.id);
 
   // create homepage article
@@ -86,13 +92,19 @@ async function publish(req: Request, res: Response) {
   if (isValidPosition) {
     await Homepage.findOneAndDelete({ position: req.body.position, category: draft.category });
 
-    const homepage = Homepage.build({
+    Homepage.create({
       ...attrs,
       position: req.body.position,
       slug: article.slug,
-    });
+    })
+      .then((homepage) => {
+        homepage.save();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-    await homepage.save();
+    // await homepage.save();
   }
 
   console.log("deploying...");
@@ -216,7 +228,13 @@ async function update(req: Request, res: Response) {
     }
   }
 
-  await draft.save();
+  try {
+    await draft.save();
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError)
+      if (error.errors.category.kind === "enum" && error.errors.category.path === "category")
+        await forceValidCategory(draft.id);
+  }
 
   res.send(draft);
 }
