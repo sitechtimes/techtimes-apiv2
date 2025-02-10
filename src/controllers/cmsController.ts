@@ -9,7 +9,6 @@ import { DraftStatus } from "../models/cms/draftStatus";
 import { Role } from "../models/role";
 import sanitize from "sanitize-html";
 import { spawn } from "child_process";
-import { User } from "../models/user";
 import { forceValidCategory } from "../utils/forceValidCategory";
 
 async function categories(req: Request, res: Response) {
@@ -80,7 +79,9 @@ async function publish(req: Request, res: Response) {
   try {
     await article.save();
   } catch (error) {
-    if (error instanceof mongoose.Error.ValidationError) await forceValidCategory(draft.id);
+    if (error instanceof mongoose.Error.ValidationError)
+      if (error.errors.category.kind === "enum" && error.errors.category.path === "category")
+        await forceValidCategory(draft.id);
   }
 
   await Draft.findByIdAndDelete(req.params.id);
@@ -230,7 +231,9 @@ async function update(req: Request, res: Response) {
   try {
     await draft.save();
   } catch (error) {
-    if (error instanceof mongoose.Error.ValidationError) await forceValidCategory(draft.id);
+    if (error instanceof mongoose.Error.ValidationError)
+      if (error.errors.category.kind === "enum" && error.errors.category.path === "category")
+        await forceValidCategory(draft.id);
   }
 
   res.send(draft);
