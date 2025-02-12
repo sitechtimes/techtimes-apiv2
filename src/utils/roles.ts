@@ -4,7 +4,7 @@ import { Role } from "../models/role";
 /**
  * @param roles an array of Roles
  *
- * proceed if the user has any of the roles in the provided parameter
+ * proceed if the user has any of the roles in the provided parameter, commonly used for checking admin
  *
  * send unauthorized otherwise
  */
