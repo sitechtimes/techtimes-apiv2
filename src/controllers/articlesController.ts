@@ -6,10 +6,16 @@ import { SortOrder } from "mongoose";
 async function homepage(req: Request, res: Response) {
   const query: any = {};
 
-  if (req.query.category) query.category = req.query.category.toString();
+  /*   if (req.query.category) query.category = req.query.category.toString();
   if (req.query.position) query.position = req.query.position.toString();
 
-  const homepages = await Homepage.find(query);
+  const homepages = await Homepage.find(query); */
+
+  const homepages = await Article.find()
+    .select("-content")
+    .sort({ updatedAt: "descending" })
+    .limit(20);
+  console.log(homepages);
   res.status(200).send(homepages);
 }
 
@@ -24,13 +30,16 @@ async function index(req: Request, res: Response) {
 
   if (req.query.sort === "dateDes") sortBy = { updatedAt: -1 as SortOrder };
 
-  const articles = await Article.find(query).sort(sortBy).skip(Number(req.query.skip) ?? 0).limit(limit + 1);
+  const articles = await Article.find(query)
+    .sort(sortBy)
+    .skip(Number(req.query.skip) ?? 0)
+    .limit(limit + 1);
   const isMore = articles.length > limit;
   if (isMore) articles.pop();
 
   const response = {
     articles: articles,
-    isMore: isMore
+    isMore: isMore,
   };
 
   res.status(200).send(response);
