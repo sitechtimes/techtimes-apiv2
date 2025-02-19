@@ -49,7 +49,7 @@ async function sendVerification(req: Request, res: Response) {
     },
   });
 
-  let mailOptions = {
+  const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email.toString(),
     subject: "TechTimes Email confirmation",
