@@ -30,7 +30,7 @@ app.use(
   cookieSession({
     signed: true,
     secret: process.env.COOKIE_KEY,
-    secure: false, // set this to true in prod
+    secure: false, // set this to true in prod. this needs https actually??
   })
 );
 
