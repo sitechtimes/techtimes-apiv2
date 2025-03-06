@@ -112,7 +112,7 @@ async function signIn(req: Request, res: Response) {
 
 async function logout(req: Request, res: Response) {
   req.session = null;
-  res.status(204).send({});
+  res.sendStatus(204);
 }
 
 async function verify(req: Request, res: Response) {

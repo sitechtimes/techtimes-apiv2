@@ -5,9 +5,9 @@ import { requireAuth } from "../utils/requireAuth";
 import { Role } from "../models/role";
 import { roles } from "../utils/roles";
 
-router.delete("/:id", requireAuth, userController.deleteUser);
 router.get("/", requireAuth, roles([Role.Admin]), userController.index);
 router.get("/:id", requireAuth, userController.show);
 router.put("/:id", requireAuth, userController.update);
+router.delete("/:id", requireAuth, userController.deleteUser);
 
 module.exports = router;

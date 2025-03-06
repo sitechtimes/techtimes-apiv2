@@ -24,8 +24,6 @@ app.use(
 
 app.use(express.json());
 
-app.use(currentUser);
-
 app.use(
   cookieSession({
     signed: true,
@@ -33,6 +31,8 @@ app.use(
     secure: false, // set this to true in prod. this needs https actually??
   })
 );
+
+app.use(currentUser);
 
 const articlesRoutes = require("./routes/articles");
 app.use("/articles", articlesRoutes);
