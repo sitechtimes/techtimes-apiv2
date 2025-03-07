@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
-import cookieSession from "cookie-session";
 import { currentUser } from "./utils/currentUser";
 
 const app = express();
@@ -23,14 +22,6 @@ app.use(
 );
 
 app.use(express.json());
-
-app.use(
-  cookieSession({
-    signed: true,
-    secret: process.env.COOKIE_KEY,
-    secure: false, // set this to true in prod. this needs https actually??
-  })
-);
 
 app.use(currentUser);
 
