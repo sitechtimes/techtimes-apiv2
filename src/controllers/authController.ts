@@ -6,6 +6,85 @@ import bcrypt from "bcrypt";
 
 const emailCooldown = 60; // email verification cooldown
 
+async function signUp(req: Request, res: Response) {
+  const { name, email, password } = req.body;
+
+  if (await User.findOne({ email }))
+    return res.status(409).json({ message: "user already exists" });
+
+  try {
+    const newUser = await User.create({
+      name,
+      email,
+      password,
+    });
+
+    await newUser.save();
+
+    return res.status(200).json();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "error" });
+  }
+}
+
+async function signIn(req: Request, res: Response) {
+  const { email, password } = req.body;
+  const existingUser = await User.findOne({ email });
+
+  if (!existingUser) return res.status(401).json({ message: "Invalid credentials" });
+
+  if (!(await bcrypt.compare(password, existingUser.password)))
+    return res.status(401).json({ message: "Invalid credentials" });
+
+  const payload = {
+    id: existingUser.id,
+    email: existingUser.email,
+    role: existingUser.role,
+  };
+
+  const userJWT = jwt.sign(payload, process.env.JWT_KEY!, { expiresIn: "6h" });
+
+  res.status(200).send({
+    ...existingUser.toJSON(),
+    token: userJWT,
+  });
+}
+
+async function logout(req: Request, res: Response) {
+  res.sendStatus(204);
+}
+
+async function verify(req: Request, res: Response) {
+  const { token } = req.query;
+
+  const user = await User.findOne({ verificationCode: token });
+
+  if (!user) return res.status(401).json({ message: "Invalid token" });
+
+  if (!process.env.JWT_KEY) return res.status(500).json({ message: "krill issue" });
+
+  try {
+    if (typeof token !== "string") throw new Error();
+    jwt.verify(token, process.env.JWT_KEY);
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+  user.verificationCode = undefined;
+  user.verified = true;
+  await user.save();
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  };
+
+  const userJWT = jwt.sign(payload, process.env.JWT_KEY!, { expiresIn: "6h" });
+
+  res.status(200).send({ ...user.toJSON(), token: userJWT });
+}
+
 async function sendVerification(req: Request, res: Response) {
   if (!req.currentUser) return res.status(401).json({ message: "Invalid credentials" });
   const { email } = req.currentUser;
@@ -61,82 +140,4 @@ async function sendVerification(req: Request, res: Response) {
   return res.status(201).json({ message: "verify email", time: Date.now() + emailCooldown * 1000 });
 }
 
-async function signUp(req: Request, res: Response) {
-  const { name, email, password } = req.body;
-
-  if (await User.findOne({ email }))
-    return res.status(409).json({ message: "user already exists" });
-
-  try {
-    const newUser = await User.create({
-      name,
-      email,
-      password,
-    });
-
-    await newUser.save();
-
-    return res.status(200).json();
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "error" });
-  }
-}
-
-async function signIn(req: Request, res: Response) {
-  const { email, password } = req.body;
-  const existingUser = await User.findOne({ email });
-
-  if (!existingUser) return res.status(401).json({ message: "Invalid credentials" });
-
-  if (!(await bcrypt.compare(password, existingUser.password)))
-    return res.status(401).json({ message: "Invalid credentials" });
-
-  const payload = {
-    id: existingUser.id,
-    email: existingUser.email,
-    role: existingUser.role,
-  };
-
-  const userJWT = jwt.sign(payload, process.env.JWT_KEY!, { expiresIn: "6h" });
-
-  res.status(200).send({
-    ...existingUser.toJSON(),
-    token: userJWT,
-  });
-}
-
-async function logout(req: Request, res: Response) {
-  res.sendStatus(204);
-}
-
-async function verify(req: Request, res: Response) {
-  const { token } = req.params;
-
-  let user = await User.findOne({ verificationCode: token });
-
-  if (!user) return res.status(401).json({ message: "Invalid token" });
-
-  if (!process.env.JWT_KEY) return res.status(500).json({ message: "krill issue" });
-
-  try {
-    jwt.verify(token, process.env.JWT_KEY);
-  } catch {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-  user.verificationCode = undefined;
-  user.verified = true;
-  await user.save();
-
-  const payload = {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-  };
-
-  const userJWT = jwt.sign(payload, process.env.JWT_KEY!, { expiresIn: "6h" });
-
-  res.status(200).send({ ...user.toJSON(), token: userJWT });
-}
-
-module.exports = { sendVerification, signUp, signIn, logout, verify };
+module.exports = { signUp, signIn, logout, verify, sendVerification };

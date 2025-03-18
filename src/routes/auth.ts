@@ -30,8 +30,7 @@ router.post(
 
 router.post("/logout", authController.logout);
 
-router.post("/verify", authController.sendVerification);
-
-router.get("/verify/:token", authController.verify);
+router.post("/verify", authController.sendVerification); // after signup
+router.get("/verify", authController.verify); // link from email
 
 module.exports = router;
