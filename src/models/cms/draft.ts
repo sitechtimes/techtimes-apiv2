@@ -40,18 +40,15 @@ const draftSchema = new mongoose.Schema(
     },
     customAuthor: {
       type: String,
-      default: null,
       required: false,
       trim: true,
     },
     imageUrl: {
       type: String,
-      default: null,
       required: false,
     },
     imageAlt: {
       type: String,
-      default: null,
       required: false,
       trim: true,
     },

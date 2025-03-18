@@ -15,7 +15,7 @@ async function homepage(req: Request, res: Response) {
     .select("-content")
     .sort({ updatedAt: "descending" })
     .limit(20);
-  console.log(homepages);
+
   res.status(200).send(homepages);
 }
 

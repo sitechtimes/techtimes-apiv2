@@ -31,7 +31,6 @@ const homepageSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String,
-      default: null,
       required: false,
     },
     content: {
