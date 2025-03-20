@@ -30,7 +30,9 @@ router.post(
 
 router.post("/logout", authController.logout);
 
-router.post("/verify", authController.sendVerification); // after signup
-router.get("/verify", authController.verify); // link from email
+// after signup, post with user credentials to get a token
+router.post("/verify", authController.sendVerification);
+// get with link from email
+router.get("/verify", authController.verify);
 
 module.exports = router;

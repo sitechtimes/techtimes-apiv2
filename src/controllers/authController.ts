@@ -57,6 +57,7 @@ async function logout(req: Request, res: Response) {
 
 async function verify(req: Request, res: Response) {
   const { token } = req.query;
+  if (typeof token !== "string") throw new Error();
 
   const user = await User.findOne({ verificationCode: token });
 
@@ -65,7 +66,6 @@ async function verify(req: Request, res: Response) {
   if (!process.env.JWT_KEY) return res.status(500).json({ message: "krill issue" });
 
   try {
-    if (typeof token !== "string") throw new Error();
     jwt.verify(token, process.env.JWT_KEY);
   } catch {
     return res.status(401).json({ message: "Invalid token" });

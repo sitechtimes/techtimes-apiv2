@@ -17,7 +17,7 @@ export const publishNetlify = (res: Response, req: Request) => {
       `--auth=${process.env.NETLIFY_TOKEN}`,
     ];
 
-    // // deploy to netlify. insane tomfoolery in that cwd but whatever
+    // deploy to netlify. insane tomfoolery in that cwd but whatever
     const deployProcess = spawn("netlify", deployCommand, { shell: true, cwd: "../sitechtimes/" });
 
     deployProcess.stdout.on("data", (data) => {
