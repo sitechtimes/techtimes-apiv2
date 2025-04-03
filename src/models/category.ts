@@ -7,4 +7,5 @@ export enum Category {
   Opinion = "opinion",
   Science = "science",
   Technology = "technology",
+  Art = "art",
 }

@@ -69,7 +69,7 @@ const articleSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String,
-      required: false,
+      required: true,
     },
     imageAlt: {
       type: String,
