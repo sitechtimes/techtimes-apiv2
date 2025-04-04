@@ -29,7 +29,8 @@ async function deleteArticle(req: Request, res: Response) {
 }
 
 async function index(req: Request, res: Response) {
-  const drafts = await Draft.find({ userId: req.currentUser!.id });
+  if (!req.currentUser) return;
+  const drafts = await Draft.find({ userId: req.currentUser.id });
 
   res.send(drafts);
 }
@@ -47,7 +48,9 @@ async function newArticle(req: Request, res: Response) {
 }
 
 async function publish(req: Request, res: Response) {
-  const draft = await Draft.findById(req.params.id);
+  const { id } = req.params;
+
+  const draft = await Draft.findById(id);
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
@@ -84,7 +87,7 @@ async function publish(req: Request, res: Response) {
         await forceValidCategory(draft.id);
   }
 
-  await Draft.findByIdAndDelete(req.params.id);
+  await Draft.findByIdAndDelete(id);
 
   // create homepage article
   const isValidPosition = Object.values(Position).includes(req.body.position);
@@ -139,7 +142,9 @@ async function show(req: Request, res: Response) {
 }
 
 async function update(req: Request, res: Response) {
-  const draft = await Draft.findById(req.params.id);
+  const { id } = req.params;
+
+  const draft = await Draft.findById(id);
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 

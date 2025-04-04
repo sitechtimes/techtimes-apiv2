@@ -3,7 +3,7 @@ import { Category } from "../models/category";
 import { Draft } from "../models/cms/draft";
 
 export const forceValidCategory = async (id: string) => {
-  const target = (await Article.findOne({ _id: id })) || (await Draft.findOne({ _id: id }));
+  const target = (await Article.findById(id)) || (await Draft.findById(id));
   if (!target) return;
   console.log(`looking at "${target.title}"'s category...`);
   if (!Object.values(Category).includes(target.category)) {
