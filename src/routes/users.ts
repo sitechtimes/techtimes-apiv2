@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 const userController = require("../controllers/userController");
-import { requireAuth } from "../utils/requireAuth";
+import { requireAuth } from "../middleware/requireAuth";
 import { Role } from "../models/role";
 import { roles } from "../utils/roles";
 

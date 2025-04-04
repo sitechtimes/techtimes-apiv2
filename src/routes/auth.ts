@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 const authController = require("../controllers/authController");
 import { body } from "express-validator";
-import { validateRequest } from "../utils/requestValidator";
+import { validateRequest } from "../middleware/requestValidator";
 
 router.post(
   "/signup",

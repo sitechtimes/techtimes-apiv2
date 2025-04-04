@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
-import { currentUser } from "./utils/currentUser";
+import { currentUser } from "./middleware/currentUser";
 
 const app = express();
 const port = process.env.PORT || 3000;

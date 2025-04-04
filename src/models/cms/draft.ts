@@ -61,8 +61,8 @@ const draftSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: Object.values(Category),
-      default: Category.Technology,
       required: true,
+      default: Category.Technology,
     },
   },
   {
