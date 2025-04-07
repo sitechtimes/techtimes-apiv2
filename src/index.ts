@@ -1,4 +1,5 @@
 import "dotenv/config";
+import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
@@ -7,7 +8,6 @@ import { currentUser } from "./middleware/currentUser";
 const app = express();
 const port = process.env.PORT || 3000;
 
-import cors from "cors";
 app.use(
   cors({
     origin: [
