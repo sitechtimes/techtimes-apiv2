@@ -1,10 +1,12 @@
 import { Response, NextFunction, Request } from "express";
+import { User } from "../models/user";
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.currentUser) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
+/** checks that the user's JWT is valid, and that they are verified */
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.currentUser) return void res.status(401).json({ message: "Unauthorized" });
+
+  const user = await User.findById(req.currentUser.id);
+  if (!user || !user.verified) return void res.status(401).json({ message: "Unauthorized" });
 
   next();
 };

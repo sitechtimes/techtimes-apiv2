@@ -57,7 +57,7 @@ async function logout(req: Request, res: Response) {
 
 async function verify(req: Request, res: Response) {
   const { token } = req.query;
-  if (typeof token !== "string") throw new Error();
+  if (typeof token !== "string") return res.status(401).json({ message: "Invalid token" });
 
   const user = await User.findOne({ verificationCode: token });
 
@@ -87,6 +87,7 @@ async function verify(req: Request, res: Response) {
 
 async function sendVerification(req: Request, res: Response) {
   if (!req.currentUser) return res.status(401).json({ message: "Invalid credentials" });
+
   const { email } = req.currentUser;
 
   const existingUser = await User.findOne({ email });

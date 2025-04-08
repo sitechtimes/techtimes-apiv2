@@ -18,21 +18,21 @@ async function categories(req: Request, res: Response) {
 }
 
 async function deleteArticle(req: Request, res: Response) {
-  const draft = await Draft.findByIdAndDelete(req.params.id);
+  const draft = await Draft.findById(req.params.id);
 
-  if (!draft) return res.status(404).json({ message: "draft not found" });
+  if (!draft) return res.status(404).json({ message: "Draft not found" });
 
   if (draft.userId !== req.currentUser!.id)
     return res.status(401).json({ message: "Unauthorized" });
 
+  await draft.deleteOne();
   res.sendStatus(204);
 }
 
 async function index(req: Request, res: Response) {
-  if (!req.currentUser) return;
-  const drafts = await Draft.find({ userId: req.currentUser.id });
+  const drafts = await Draft.find({ userId: req.currentUser!.id });
 
-  res.send(drafts);
+  res.status(200).send(drafts);
 }
 
 async function newArticle(req: Request, res: Response) {
@@ -118,13 +118,13 @@ async function forcePublish(req: Request, res: Response) {
 async function ready(req: Request, res: Response) {
   const drafts = await Draft.find({ status: DraftStatus.Ready });
 
-  res.send(drafts);
+  res.status(200).send(drafts);
 }
 
 async function review(req: Request, res: Response) {
   const drafts = await Draft.find({ status: DraftStatus.Review });
 
-  res.send(drafts);
+  res.status(200).send(drafts);
 }
 
 async function show(req: Request, res: Response) {
@@ -134,11 +134,11 @@ async function show(req: Request, res: Response) {
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
-  if (draft.userId !== req.currentUser!.id && req.currentUser!.role === Role.Writer) {
+  // writers can only see their own articles
+  if (draft.userId !== req.currentUser!.id && req.currentUser!.role === Role.Writer)
     return res.status(401).json({ message: "Unauthorized" });
-  }
 
-  res.send(draft);
+  res.status(200).send(draft);
 }
 
 async function update(req: Request, res: Response) {
@@ -165,13 +165,13 @@ async function update(req: Request, res: Response) {
       ? draft.customAuthor
       : req.body.customAuthor;
 
-    // editors can only send to review
-    const status = req.body.status == DraftStatus.Review ? req.body.status : draft.status;
+    // writers can only send to review
+    const status = req.body.status === DraftStatus.Review ? req.body.status : draft.status;
 
-    // editors can change article category
+    // writers can change article category
     // will CRASH AND BURN if it's not valid enum. just kinda ignore them if it's invalid
     const category =
-      req.body.category == undefined || !Object.values(Category).includes(req.body.category)
+      req.body.category === undefined || !Object.values(Category).includes(req.body.category)
         ? draft.category
         : req.body.category;
 
