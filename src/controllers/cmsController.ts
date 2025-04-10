@@ -30,10 +30,18 @@ async function deleteArticle(req: Request, res: Response) {
 }
 
 async function index(req: Request, res: Response) {
-  const drafts = await Draft.find({ userId: req.currentUser!.id });
+  const { status } = req.query; 
+  let drafts;
+
+  if (status) {
+    drafts = await Draft.find({ userId: req.currentUser!.id, status });
+  } else {
+    drafts = await Draft.find({ userId: req.currentUser!.id });
+  }
 
   res.status(200).send(drafts);
 }
+
 
 async function newArticle(req: Request, res: Response) {
   const draft = await Draft.create({
