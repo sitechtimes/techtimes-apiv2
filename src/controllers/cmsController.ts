@@ -10,6 +10,7 @@ import { Role } from "../models/role";
 import sanitize from "sanitize-html";
 import { forceValidCategory } from "../utils/forceValidCategory";
 import { publishNetlify } from "../utils/publishNetlify";
+import { User } from "../models/user";
 
 async function categories(req: Request, res: Response) {
   const categories = Object.values(Category);
@@ -53,11 +54,9 @@ async function publish(req: Request, res: Response) {
 
   if (!mongoose.connection.db) return res.status(500).json({ message: "krill issue" });
 
-  const db = mongoose.connection.db.collection("users");
+  const user = await User.findById(draft.userId);
 
-  const users = await db.find({ _id: new mongoose.Types.ObjectId(draft.userId) }).toArray();
-
-  if (!users[0]) return res.status(404).json({ message: "author not found" });
+  if (!user) return res.status(404).json({ message: "author not found" });
 
   const attrs = {
     title: draft.title,
@@ -68,8 +67,8 @@ async function publish(req: Request, res: Response) {
     category: draft.category,
     user: {
       id: draft.userId,
-      name: users[0].name,
-      imageUrl: users[0].imageUrl,
+      name: user.name,
+      imageUrl: user.imageUrl,
     },
   };
 
