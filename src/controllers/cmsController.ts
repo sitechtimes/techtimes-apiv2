@@ -30,18 +30,44 @@ async function deleteArticle(req: Request, res: Response) {
 }
 
 async function index(req: Request, res: Response) {
-  const { status } = req.query; 
-  let drafts;
+  try {
+    const { status } = req.query;
 
-  if (status) {
-    drafts = await Draft.find({ userId: req.currentUser!.id, status });
-  } else {
-    drafts = await Draft.find({ userId: req.currentUser!.id });
+    if (!req.currentUser || !req.currentUser.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Prepare the base query
+    const query: any = {
+      userId: req.currentUser.id,
+    };
+
+    // Apply status filter if it's provided and valid
+    if (status && Object.values(DraftStatus).includes(status as DraftStatus)) {
+      query.status = status;
+    }
+
+    // Admins and editors can see all drafts (remove userId constraint)
+    if (
+      req.currentUser.role === Role.Admin ||
+      req.currentUser.role === Role.Editor
+    ) {
+      if (status && Object.values(DraftStatus).includes(status as DraftStatus)) {
+        query.status = status;
+        delete query.userId; // Admins/Editors can see drafts from all users
+      } else {
+        delete query.userId;
+      }
+    }
+
+    const drafts = await Draft.find(query);
+    return res.status(200).json(drafts);
+
+  } catch (error) {
+    console.error("Error in CMS index:", error);
+    return res.status(500).json({ message: "Failed to fetch drafts" });
   }
-
-  res.status(200).send(drafts);
 }
-
 
 async function newArticle(req: Request, res: Response) {
   const draft = await Draft.create({
