@@ -2,12 +2,46 @@ import mongoose from "mongoose";
 import { DraftStatus } from "./draftStatus";
 import { Category } from "../category";
 
-interface DraftAttrs {
-  title: string;
-  content: string;
-  userId: string;
-  customAuthor?: string;
-}
+const schemaDefinition = {
+  title: {
+    type: String,
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
+    required: true,
+  },
+  customAuthor: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  imageUrl: {
+    type: String,
+    required: false,
+  },
+  imageAlt: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  status: {
+    type: String,
+    enum: Object.values(DraftStatus),
+    required: true,
+    default: DraftStatus.Draft,
+  },
+  category: {
+    type: String,
+    enum: Object.values(Category),
+    required: true,
+    default: Category.Technology,
+  },
+} as const;
 
 interface DraftModel extends mongoose.Model<DraftDoc> {
   build(attrs: DraftAttrs): DraftDoc;
@@ -68,18 +102,8 @@ const draftSchema = new mongoose.Schema(
       default: Category.Technology,
     },
   },
-  {
-    timestamps: true,
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-      },
-    },
-  }
 );
 
-const Draft = mongoose.model<DraftDoc, DraftModel>("Draft", draftSchema);
+const Draft = mongoose.model("Draft", draftSchema);
 
-export { draftSchema, Draft };
+export { Draft };
