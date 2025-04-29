@@ -12,23 +12,24 @@ import { forceValidCategory } from "../utils/forceValidCategory";
 import { publishNetlify } from "../utils/publishNetlify";
 import { User } from "../models/user";
 
+// Categories endpoint
 async function categories(req: Request, res: Response) {
   const categories = Object.values(Category);
   res.status(200).send(categories);
 }
 
+// Delete an article
 async function deleteArticle(req: Request, res: Response) {
   const draft = await Draft.findById(req.params.id);
-
   if (!draft) return res.status(404).json({ message: "Draft not found" });
 
-  if (draft.userId !== req.currentUser!.id)
-    return res.status(401).json({ message: "Unauthorized" });
+  if (draft.userId !== req.currentUser!.id) return res.status(401).json({ message: "Unauthorized" });
 
   await draft.deleteOne();
   res.sendStatus(204);
 }
 
+// Index endpoint - List drafts (filtered by status if provided)
 async function index(req: Request, res: Response) {
   const { status } = req.query;
   let drafts;
@@ -42,6 +43,7 @@ async function index(req: Request, res: Response) {
   res.status(200).send(drafts);
 }
 
+// Create a new article (draft)
 async function newArticle(req: Request, res: Response) {
   const draft = await Draft.create({
     title: "Untitled",
@@ -53,6 +55,7 @@ async function newArticle(req: Request, res: Response) {
   res.status(201).send(draft);
 }
 
+// Publish an article (from draft)
 async function publish(req: Request, res: Response) {
   const { id } = req.params;
   const draft = await Draft.findById(id);
@@ -110,20 +113,24 @@ async function publish(req: Request, res: Response) {
   publishNetlify(req, res);
 }
 
+// Force publish the article
 async function forcePublish(req: Request, res: Response) {
   publishNetlify(req, res);
 }
 
+// Ready endpoint
 async function ready(req: Request, res: Response) {
   const drafts = await Draft.find({ status: DraftStatus.Ready });
   res.status(200).send(drafts);
 }
 
+// Review endpoint
 async function review(req: Request, res: Response) {
   const drafts = await Draft.find({ status: DraftStatus.Review });
   res.status(200).send(drafts);
 }
 
+// Show a single draft by ID
 async function show(req: Request, res: Response) {
   const { id } = req.params;
   const draft = await Draft.findById(id);
@@ -136,6 +143,7 @@ async function show(req: Request, res: Response) {
   res.status(200).send(draft);
 }
 
+// Update a draft
 async function update(req: Request, res: Response) {
   const { id } = req.params;
   const draft = await Draft.findById(id);
@@ -152,9 +160,7 @@ async function update(req: Request, res: Response) {
 
     const title = isEmpty(req.body.title) ? draft.title : sanitize(req.body.title);
     const content = isEmpty(req.body.content) ? draft.content : sanitize(req.body.content);
-    const customAuthor = isEmpty(req.body.customAuthor)
-      ? draft.customAuthor
-      : req.body.customAuthor;
+    const customAuthor = isEmpty(req.body.customAuthor) ? draft.customAuthor : req.body.customAuthor;
     const status = req.body.status === DraftStatus.Review ? req.body.status : draft.status;
     const category =
       req.body.category === undefined || !Object.values(Category).includes(req.body.category)

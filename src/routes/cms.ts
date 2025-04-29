@@ -5,7 +5,9 @@ import { requireAuth } from "../middleware/requireAuth";
 import { Role } from "../models/role";
 import { roles } from "../utils/roles";
 
-router.get("/", requireAuth, cmsController.index);
+// Fetch articles based on their status
+router.get("/", requireAuth, cmsController.index); // The existing route, now it will handle status filtering
+
 router.post("/", requireAuth, cmsController.newArticle);
 router.get("/review/", requireAuth, roles([Role.Editor, Role.Admin]), cmsController.review);
 router.get("/ready", requireAuth, roles([Role.Admin]), cmsController.ready);
