@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { InferSchemaType } from "mongoose";
 import { Category } from "./category";
 const mongooseSlugPlugin = require("mongoose-slug-plugin");
 
@@ -63,6 +63,8 @@ const articleSchema = new mongoose.Schema(schemaDefinition, {
 
 articleSchema.plugin(mongooseSlugPlugin, { tmpl: "<%=title%>" });
 
-const Article = mongoose.model("Article", articleSchema);
+type Article = InferSchemaType<typeof articleSchema>;
 
-export { Article };
+const ArticleModel = mongoose.model("Article", articleSchema);
+
+export { ArticleModel, type Article };

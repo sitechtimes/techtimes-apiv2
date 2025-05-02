@@ -23,7 +23,8 @@ async function deleteArticle(req: Request, res: Response) {
   const draft = await Draft.findById(req.params.id);
   if (!draft) return res.status(404).json({ message: "Draft not found" });
 
-  if (draft.userId !== req.currentUser!.id) return res.status(401).json({ message: "Unauthorized" });
+  if (draft.userId !== req.currentUser!.id)
+    return res.status(401).json({ message: "Unauthorized" });
 
   await draft.deleteOne();
   res.sendStatus(204);
@@ -153,38 +154,40 @@ async function update(req: Request, res: Response) {
   if (draft.userId !== req.currentUser!.id && req.currentUser!.role === Role.Writer)
     return res.status(401).json({ message: "Unauthorized" });
 
-  if (draft.userId == req.currentUser!.id) {
+  if (draft.userId === req.currentUser!.id) {
     function isEmpty(thing: any) {
       return String(thing).trim().length === 0;
     }
 
     const title = isEmpty(req.body.title) ? draft.title : sanitize(req.body.title);
     const content = isEmpty(req.body.content) ? draft.content : sanitize(req.body.content);
-    const customAuthor = isEmpty(req.body.customAuthor) ? draft.customAuthor : req.body.customAuthor;
+    const customAuthor = isEmpty(req.body.customAuthor)
+      ? draft.customAuthor
+      : req.body.customAuthor;
     const status = req.body.status === DraftStatus.Review ? req.body.status : draft.status;
     const category =
       req.body.category === undefined || !Object.values(Category).includes(req.body.category)
         ? draft.category
         : req.body.category;
-    const imageUrl = req.body.imageUrl == undefined ? draft.imageUrl : req.body.imageUrl;
-    const imageAlt = req.body.imageAlt == undefined ? draft.imageAlt : req.body.imageAlt;
+    const imageUrl = req.body.imageUrl === undefined ? draft.imageUrl : req.body.imageUrl;
+    const imageAlt = req.body.imageAlt === undefined ? draft.imageAlt : req.body.imageAlt;
 
     draft.set({ title, content, customAuthor, status, imageUrl, imageAlt, category });
   }
 
   if (
-    req.currentUser!.role == Role.Editor ||
-    (req.currentUser!.role == Role.Admin && draft.status == DraftStatus.Review)
+    req.currentUser!.role === Role.Editor ||
+    (req.currentUser!.role === Role.Admin && draft.status === DraftStatus.Review)
   ) {
-    if (req.body.status == DraftStatus.Ready || req.body.status == DraftStatus.Draft) {
+    if (req.body.status === DraftStatus.Ready || req.body.status === DraftStatus.Draft) {
       draft.set({
         status: req.body.status,
       });
     }
   }
 
-  if (req.currentUser!.role == Role.Admin && draft.status == DraftStatus.Ready) {
-    if (req.body.status == DraftStatus.Draft) {
+  if (req.currentUser!.role === Role.Admin && draft.status === DraftStatus.Ready) {
+    if (req.body.status === DraftStatus.Draft) {
       draft.set({
         status: req.body.status,
       });
