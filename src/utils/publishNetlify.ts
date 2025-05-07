@@ -8,7 +8,7 @@ export const publishNetlify = (req: Request, res: Response) => {
     let output = "";
     let error = "";
 
-    res.sendStatus(200); // so user doesn't have to wait
+    res.sendStatus(202); // so user doesn't have to wait
 
     const deployCommand = [
       "deploy",
