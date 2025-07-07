@@ -1,20 +1,17 @@
 import { Request, Response } from "express";
-import { Homepage } from "../models/homepage";
-import { Article } from "../models/article";
+import { Article, type ArticleType } from "../models/article";
 import { FilterQuery, SortOrder } from "mongoose";
 
 async function homepage(req: Request, res: Response) {
-  const query: FilterQuery<typeof Article> = {};
+  const query: FilterQuery<ArticleType> = {};
 
   if (req.query.category) query.category = req.query.category.toString();
   if (req.query.position) query.position = req.query.position.toString();
 
-  const homepages = await Homepage.find(query);
-
-  // const homepages = await Article.find()
-  //   .select("-content")
-  //   .sort({ updatedAt: "descending" })
-  //   .limit(20);
+  const homepages = await Article.find()
+    .select("-content")
+    .sort({ updatedAt: "descending" })
+    .limit(20);
   res.status(200).send(homepages);
 }
 

@@ -63,8 +63,8 @@ const articleSchema = new mongoose.Schema(schemaDefinition, {
 
 articleSchema.plugin(mongooseSlugPlugin, { tmpl: "<%=title%>" });
 
-type Article = InferSchemaType<typeof articleSchema>;
+type ArticleType = InferSchemaType<typeof articleSchema>;
 
-const ArticleModel = mongoose.model("Article", articleSchema);
+const Article = mongoose.model("Article", articleSchema);
 
-export { ArticleModel, type Article };
+export { Article, type ArticleType };

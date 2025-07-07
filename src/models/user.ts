@@ -1,4 +1,4 @@
-import mongoose, { ToObjectOptions } from "mongoose";
+import mongoose, { InferSchemaType } from "mongoose";
 import { Role } from "./role";
 import bcrypt from "bcrypt";
 
@@ -38,6 +38,8 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+type UserType = InferSchemaType<typeof userSchema>;
+
 const User = mongoose.model("User", userSchema);
 
-export { User };
+export { User, type UserType };

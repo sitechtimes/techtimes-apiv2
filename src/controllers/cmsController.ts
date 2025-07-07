@@ -4,7 +4,6 @@ import { Draft } from "../models/cms/draft";
 import mongoose from "mongoose";
 import { Article } from "../models/article";
 import { Position } from "../models/position";
-import { Homepage } from "../models/homepage";
 import { DraftStatus } from "../models/cms/draftStatus";
 import { Role } from "../models/role";
 import sanitize from "sanitize-html";
@@ -59,13 +58,18 @@ async function newArticle(req: Request, res: Response) {
 // Publish an article (from draft)
 async function publish(req: Request, res: Response) {
   const { id } = req.params;
+
   const draft = await Draft.findById(id);
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
+
   if (!mongoose.connection.db) return res.status(500).json({ message: "krill issue" });
 
   const user = await User.findById(draft.userId);
   if (!user) return res.status(404).json({ message: "author not found" });
+
+  const isValidPosition = Object.values(Position).includes(req.body.position);
+  if (!isValidPosition) return res.status(400).json({ message: "invalid position" });
 
   const attrs = {
     title: draft.title,
@@ -93,25 +97,7 @@ async function publish(req: Request, res: Response) {
 
   await Draft.findByIdAndDelete(id);
 
-  const isValidPosition = Object.values(Position).includes(req.body.position);
-
-  if (isValidPosition) {
-    await Homepage.findOneAndDelete({ position: req.body.position, category: draft.category });
-
-    Homepage.create({
-      ...attrs,
-      position: req.body.position,
-      slug: article.slug,
-    })
-      .then((homepage) => {
-        homepage.save();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  publishNetlify(req, res);
+  if (process.env.NODE_ENV === "production") publishNetlify(req, res);
 }
 
 // Force publish the article
