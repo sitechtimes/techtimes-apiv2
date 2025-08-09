@@ -12,7 +12,7 @@ export const roles = (roles: Array<Role>) => (req: Request, res: Response, next:
   const authorized = roles.some((role) => req.currentUser!.role === role);
 
   if (!authorized) {
-    res.status(401).json({ message: "Unauthorized" });
+    res.sendStatus(401);
     return;
   }
 

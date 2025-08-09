@@ -5,7 +5,7 @@ import { Role } from "../models/role";
 async function deleteUser(req: Request, res: Response) {
   const { id } = req.params;
 
-  if (req.currentUser!.id !== id) return res.status(401).json({ message: "Unauthorized" });
+  if (req.currentUser!.id !== id) return res.sendStatus(401);
 
   await User.findByIdAndDelete(id);
   res.sendStatus(204);
@@ -18,8 +18,8 @@ async function index(req: Request, res: Response) {
 
 async function show(req: Request, res: Response) {
   const user = await User.findById(req.params.id);
-  if (!user) return res.status(404).json({ message: "chat is this user real" });
-  await user.save();
+  // chat is this user real
+  if (!user) return res.status(404).json({ error: "USER_NOT_FOUND" });
   res.send(user);
 }
 
@@ -28,21 +28,21 @@ async function update(req: Request, res: Response) {
 
   const user = await User.findById(req.params.id);
 
-  if (!user || !req.currentUser) return res.status(404).json({ message: "chat is this user real" });
+  if (!user || !req.currentUser) return res.status(404).json({ error: "USER_NOT_FOUND" });
 
   if (user.id === req.currentUser.id || req.currentUser.role === Role.Admin) {
     const image = imageUrl === undefined ? user.imageUrl : imageUrl;
     user.set({ imageUrl: image });
   }
   // don't change other people's things!!
-  else return res.status(401).json({ message: "Unauthorized" });
+  else return res.sendStatus(401);
 
   // only admins can update roles!!
   if (role && user.role !== role) {
     if (req.currentUser!.role === Role.Admin) {
       const updatedRole = role === undefined ? user.role : role;
       user.set({ role: updatedRole });
-    } else return res.status(401).json({ message: "Unauthorized" });
+    } else return res.sendStatus(401);
   }
 
   await user.save();

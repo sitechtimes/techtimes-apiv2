@@ -1,5 +1,5 @@
 export enum DraftStatus {
-  Draft = "draft",
-  Review = "review",
-  Ready = "ready",
+  Draft = "draft", // writer
+  Review = "review", // editor
+  Ready = "ready", // admin, ready to publish
 }
