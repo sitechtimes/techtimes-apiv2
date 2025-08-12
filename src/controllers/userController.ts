@@ -5,7 +5,8 @@ import { Role } from "../models/role";
 async function deleteUser(req: Request, res: Response) {
   const { id } = req.params;
 
-  if (req.currentUser!.id !== id) return res.sendStatus(401);
+  if (req.currentUser!.role !== Role.Admin)
+    return res.status(401).json({ message: "Unauthorized" });
 
   await User.findByIdAndDelete(id);
   res.sendStatus(204);

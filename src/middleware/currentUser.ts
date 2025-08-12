@@ -24,8 +24,8 @@ export const currentUser = (req: Request, res: Response, next: NextFunction) => 
       process.env.JWT_KEY!
     ) as UserPayload;
     req.currentUser = payload;
-  } catch {
-    // the dreaded message.
+  } catch (e) {
+    console.error(e);
     return void res.status(401).json({ message: "you are invalid" });
   }
 
