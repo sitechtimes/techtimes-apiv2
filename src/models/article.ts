@@ -12,6 +12,10 @@ const schemaDefinition = {
     type: String,
     required: true,
   },
+  deltaContent: {
+    type: Object,
+    required: false,
+  },
   customAuthor: {
     type: String,
     required: false,
