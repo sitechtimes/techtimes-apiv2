@@ -42,7 +42,10 @@ async function index(req: Request, res: Response) {
 async function newArticle(req: Request, res: Response) {
   const draft = await Draft.create({
     title: "Untitled",
-    content: "This is where you should write the content of your article...",
+    content: "This is where you should write the content of your article ...",
+    deltaContent: {
+      ops: [{ insert: "This is where you should write the content of your article ..." }],
+    },
     userId: req.currentUser!.id,
   });
 
@@ -147,16 +150,14 @@ async function update(req: Request, res: Response) {
   if (!draft) return res.status(404).json({ error: "DRAFT_NOT_FOUND" });
   if (!req.currentUser) return res.sendStatus(401);
 
-  // WRITER cannot update other people's DRAFT
-  if (draft.userId !== req.currentUser.id && req.currentUser.role === Role.Writer)
-    return res.sendStatus(401);
-
-  // USER is updating their own DRAFT
-  if (draft.userId === req.currentUser.id) {
+  if (draft.userId !== req.currentUser!.id && req.currentUser!.role === Role.Writer)
+    return res.status(401).json({ message: "Unauthorized" });
+  // draft - for writer
+  if (draft.userId == req.currentUser!.id) {
+    // TODO - refactor update logic
     function isEmpty(thing: any) {
       return String(thing).trim().length === 0;
     }
-
     // these are required!!!! do not let them be empty!!
     const title = isEmpty(req.body.title) ? draft.title : sanitize(req.body.title);
     const content = isEmpty(req.body.content) ? draft.content : sanitize(req.body.content);
@@ -175,10 +176,14 @@ async function update(req: Request, res: Response) {
         : req.body.category;
 
     // not required whatever
-    const imageUrl = req.body.imageUrl === undefined ? draft.imageUrl : req.body.imageUrl;
-    const imageAlt = req.body.imageAlt === undefined ? draft.imageAlt : req.body.imageAlt;
+    const imageUrl = req.body.imageUrl ?? draft.imageUrl;
+    const imageAlt = req.body.imageAlt ?? draft.imageAlt;
 
-    draft.set({ title, content, customAuthor, status, imageUrl, imageAlt, category });
+    const deltaContent = req.body.deltaContent ?? {};
+
+    console.log(deltaContent);
+
+    draft.set({ title, content, deltaContent, customAuthor, status, imageUrl, imageAlt, category });
   }
 
   // EDITOR/ADMIN - can move to ready and back to draft
@@ -186,9 +191,19 @@ async function update(req: Request, res: Response) {
     [Role.Editor, Role.Admin].includes(req.currentUser.role as Role) &&
     [DraftStatus.Draft, DraftStatus.Review].includes(req.body.status)
   ) {
-    draft.set({
-      status: req.body.status,
-    });
+    if (req.body.status == DraftStatus.Ready || req.body.status == DraftStatus.Draft) {
+      draft.set({
+        status: req.body.status,
+      });
+    }
+  }
+  // admin
+  if (req.currentUser!.role == Role.Admin && draft.status == DraftStatus.Ready) {
+    if (req.body.status == DraftStatus.Draft) {
+      draft.set({
+        status: req.body.status,
+      });
+    }
   }
 
   try {
