@@ -19,7 +19,7 @@ const schemaDefinition = {
 
 const userSchema = new mongoose.Schema(schemaDefinition, {
   toJSON: {
-    transform(doc, ret, options) {
+    transform(doc, ret: any, options) {
       ret.id = ret._id;
       delete ret._id;
       delete ret.__v;

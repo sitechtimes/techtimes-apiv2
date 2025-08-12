@@ -137,6 +137,36 @@ async function sendVerification(req: Request, res: Response) {
       .status(201)
       .json({ message: "verification sent", time: Date.now() + emailCooldown * 1000 });
   }
+  // if newToken is false but the user doesn't have a verification code, send it anyway
+
+  const verificationToken = jwt.sign({ email }, process.env.JWT_KEY!, {
+    expiresIn: "20m",
+  });
+
+  existingUser.verificationCode = verificationToken;
+  await existingUser.save();
+
+  const transport = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    // TODO: is this supposed to be false??
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email.toString(),
+    subject: "TechTimes Email confirmation",
+    html: `Hello there, click the following link to verify your email: <a href="${process.env.URL}:8000/auth/verify?token=${verificationToken}">Verify Email</a>`,
+  };
+
+  await transport.sendMail(mailOptions);
+
+  return res.status(201).json({ message: "verify email", time: Date.now() + emailCooldown * 1000 });
 }
 
 module.exports = { signUp, signIn, logout, verify, sendVerification };
