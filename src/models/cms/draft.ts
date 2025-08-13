@@ -28,53 +28,51 @@ interface DraftModel extends mongoose.Model<DraftDoc> {
   build(attrs: DraftAttrs): DraftDoc;
 }
 
-const draftSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
+const draftSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: String,
+      required: true,
+    },
+    customAuthor: {
+      type: String,
+      default: null,
+      required: false,
+      trim: true,
+    },
+    imageUrl: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    imageAlt: {
+      type: String,
+      default: null,
+      required: false,
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: Object.values(DraftStatus),
+      required: true,
+      default: DraftStatus.Draft,
+    },
+    category: {
+      type: String,
+      enum: Object.values(Category),
+      required: true,
+      default: Category.Technology,
+    },
   },
-  content: {
-    type: String,
-    required: true,
-  },
-  deltaContent: {
-    type: Object,
-    required: true,
-  },
-  userId: {
-    type: String,
-    required: true,
-  },
-  customAuthor: {
-    type: String,
-    default: null,
-    required: false,
-    trim: true,
-  },
-  imageUrl: {
-    type: String,
-    default: null,
-    required: false,
-  },
-  imageAlt: {
-    type: String,
-    default: null,
-    required: false,
-    trim: true,
-  },
-  status: {
-    type: String,
-    enum: Object.values(DraftStatus),
-    required: true,
-    default: DraftStatus.Draft,
-  },
-  category: {
-    type: String,
-    enum: Object.values(Category),
-    required: true,
-    default: Category.Technology,
-  },
-});
+);
 
 // optional: add build function if you want
 draftSchema.statics.build = (attrs: DraftAttrs) => {

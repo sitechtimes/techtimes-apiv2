@@ -12,10 +12,6 @@ const schemaDefinition = {
     type: String,
     required: true,
   },
-  deltaContent: {
-    type: Object,
-    required: false,
-  },
   customAuthor: {
     type: String,
     required: false,
@@ -56,7 +52,7 @@ const schemaDefinition = {
 const articleSchema = new mongoose.Schema(schemaDefinition, {
   timestamps: true,
   toJSON: {
-    transform(doc, ret: any) {
+    transform(doc, ret) {
       ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
