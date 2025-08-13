@@ -159,7 +159,12 @@ async function update(req: Request, res: Response) {
 
     // these are required!!!! do not let them be empty!!
     const title = isEmpty(req.body.title) ? draft.title : sanitize(req.body.title);
-    const content = isEmpty(req.body.content) ? draft.content : sanitize(req.body.content);
+    const content = isEmpty(req.body.content)
+      ? draft.content
+      : sanitize(req.body.content, {
+          allowedTags: sanitize.defaults.allowedTags.concat(["img"]),
+          allowedSchemes: ["data", "http", "https"],
+        });
     const customAuthor = isEmpty(req.body.customAuthor)
       ? draft.customAuthor
       : req.body.customAuthor;
