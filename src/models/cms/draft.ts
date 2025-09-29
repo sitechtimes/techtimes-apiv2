@@ -59,6 +59,11 @@ const draftSchema = new mongoose.Schema(
       required: false,
       trim: true,
     },
+    editorResponses: [{
+      type: String,
+      default: [],
+      required: false,
+    }],
     status: {
       type: String,
       enum: Object.values(DraftStatus),
