@@ -77,6 +77,9 @@ const draftSchema = new mongoose.Schema(
       default: Category.Technology,
     },
   },
+  {
+    timestamps: true,
+  }
 );
 
 // optional: add build function if you want
