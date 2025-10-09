@@ -187,10 +187,12 @@ async function update(req: Request, res: Response) {
   }
 
   // EDITOR/ADMIN - can move to ready and back to draft
+  console.log("skib");
   if (
-    [Role.Editor, Role.Admin].includes(req.currentUser.role as Role) &&
-    [DraftStatus.Draft, DraftStatus.Review].includes(req.body.status)
+    ([Role.Editor, Role.Admin].includes(req.currentUser.role as Role) && DraftStatus.Draft,
+    DraftStatus.Ready == req.body.status)
   ) {
+    console.log("test");
     draft.set({
       status: req.body.status,
     });
