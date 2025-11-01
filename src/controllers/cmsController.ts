@@ -163,7 +163,10 @@ async function update(req: Request, res: Response) {
       ? draft.content
       : sanitize(req.body.content, {
           allowedTags: sanitize.defaults.allowedTags.concat(["img", "del"]),
-          allowedSchemes: ["data", "http", "https"],
+          allowedAttributes: {
+            span: ["style"],
+          },
+          allowedSchemes: sanitize.defaults.allowedSchemes.concat(["data", "http", "https"]),
         });
     const customAuthor = isEmpty(req.body.customAuthor)
       ? draft.customAuthor
