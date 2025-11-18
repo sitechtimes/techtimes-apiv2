@@ -11,6 +11,7 @@ import sanitize from "sanitize-html";
 import { forceValidCategory } from "../utils/forceValidCategory";
 import { publishNetlify } from "../utils/publishNetlify";
 import { User } from "../models/user";
+import { getEffectiveTypeParameterDeclarations } from "typescript";
 
 // get categories
 async function categories(req: Request, res: Response) {
@@ -205,8 +206,15 @@ async function update(req: Request, res: Response) {
   } catch (error) {
     // catch invalid categories
     if (error instanceof mongoose.Error.ValidationError)
-      if (error.errors.category.kind === "enum" && error.errors.category.path === "category")
-        await forceValidCategory(draft.id);
+      if (error instanceof mongoose.Error.ValidationError) {
+        if (
+          error.errors.category &&
+          error.errors.category.kind === "enum" &&
+          error.errors.category.path === "category"
+        ) {
+          await forceValidCategory(draft.id);
+        }
+      }
   }
 
   res.send(draft);
