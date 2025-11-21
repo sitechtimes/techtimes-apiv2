@@ -187,7 +187,19 @@ async function update(req: Request, res: Response) {
     const imageUrl = req.body.imageUrl === undefined ? draft.imageUrl : req.body.imageUrl;
     const imageAlt = req.body.imageAlt === undefined ? draft.imageAlt : req.body.imageAlt;
 
-    draft.set({ title, content, customAuthor, status, imageUrl, imageAlt, category });
+    const editorResponses =
+      req.body.editorResponses === undefined ? draft.editorResponses : req.body.editorResponses;
+
+    draft.set({
+      title,
+      content,
+      customAuthor,
+      status,
+      editorResponses,
+      imageUrl,
+      imageAlt,
+      category,
+    });
   }
 
   // EDITOR/ADMIN - can move to ready and back to draft
