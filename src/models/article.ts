@@ -47,7 +47,12 @@ const schemaDefinition = {
   slug: {
     type: String,
   },
-  viewCount: {
+  viewCountDaily: {
+    type: Number,
+    required: false /* Make true if I even get ts working */,
+    default: 0,
+  },
+  viewCountTotal: {
     type: Number,
     required: false /* Make true if I even get ts working */,
     default: 0,
