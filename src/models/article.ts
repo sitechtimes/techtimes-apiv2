@@ -47,6 +47,11 @@ const schemaDefinition = {
   slug: {
     type: String,
   },
+  viewCount: {
+    type: Number,
+    required: false /* Make true if I even get ts working */,
+    default: 0,
+  },
 } as const;
 
 const articleSchema = new mongoose.Schema(schemaDefinition, {

@@ -42,7 +42,12 @@ async function index(req: Request, res: Response) {
 async function show(req: Request, res: Response) {
   const { slug } = req.params;
 
-  const article = await Article.findOne({ slug });
+  // posssibly adds one every time article is fetched?
+  const article = await Article.findOneAndUpdate(
+    { slug },
+    { $inc: { viewCount: 1 } },
+    { new: true }
+  );
 
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 
