@@ -47,7 +47,7 @@ const schemaDefinition = {
   slug: {
     type: String,
   },
-  viewCountDaily: {
+  viewCountMonthly: {
     type: Number,
     required: false /* Make true if I even get ts working */,
     default: 0,
