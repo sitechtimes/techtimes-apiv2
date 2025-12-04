@@ -45,7 +45,7 @@ async function show(req: Request, res: Response) {
   // posssibly adds one every time article is fetched?
   const article = await Article.findOneAndUpdate(
     { slug },
-    { $inc: { viewCountDaily: 1, viewCountTotal: 1 } },
+    { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
     { new: true }
   );
 
