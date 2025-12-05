@@ -20,10 +20,11 @@ function monthCheck() {
 }
 
 /* Somehow get this to apply to all articles when called */
-function resetMonthlyViews() {
+export async function resetMonthlyViews() {
   monthCheck();
   if (resetTime === true) {
     console.log("for me to see");
+    return Article.updateMany({}, { viewCountMonthly: 0 });
   } else {
     null;
   }

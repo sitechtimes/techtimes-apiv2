@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Article } from "../models/article";
 import { SortOrder } from "mongoose";
+import { resetMonthlyViews } from "../utils/monthlyViewReset";
 
 /** get 20 most recent articles */
 async function homepage(req: Request, res: Response) {
@@ -48,7 +49,7 @@ async function show(req: Request, res: Response) {
     { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
     { new: true }
   );
-
+  await resetMonthlyViews();
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 
   res.status(200).send(article);
