@@ -2,29 +2,34 @@ import { Article } from "../models/article";
 const { DateTime } = require("luxon");
 const currentDate = DateTime.now().toObject();
 var resetTime: boolean = false;
+var resetDone: boolean = false;
 console.log(currentDate);
 
-/* Write a monthly checker that resets viewsmonthly */
-
-/* possible logic issue for later on is that it might continue to reset the views the whole day or when articles are fetched. Possibly */
 function monthCheck() {
   const currentDay = currentDate.day;
-  const resetDay = 1;
-  if (currentDay === resetDay) {
+  const resetDay: number = 1;
+  if (currentDay === resetDay && resetDone === false) {
     resetTime = true;
     return resetTime;
+  } else if (currentDay === resetDay && resetDone === true) {
+    resetTime = false;
+    return resetTime;
+  } else if (currentDay !== resetDay) {
+    /* this whole function has to run every day then somewhere in order for the logic to work */
+    resetDone = false;
+    resetTime = false;
+    return [resetTime, resetDone];
   } else {
     resetTime = false;
     return resetTime;
   }
 }
 
-/* Somehow get this to apply to all articles when called */
 export async function resetMonthlyViews() {
   monthCheck();
-  if (resetTime === true) {
-    console.log("for me to see");
-    return Article.updateMany({}, { viewCountMonthly: 0 });
+  if (resetTime === true && resetDone === false) {
+    resetDone = true;
+    return [resetDone, Article.updateMany({}, { viewCountMonthly: 0 })];
   } else {
     null;
   }

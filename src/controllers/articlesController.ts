@@ -43,13 +43,12 @@ async function index(req: Request, res: Response) {
 async function show(req: Request, res: Response) {
   const { slug } = req.params;
 
-  // posssibly adds one every time article is fetched?
   const article = await Article.findOneAndUpdate(
     { slug },
     { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
     { new: true }
   );
-  await resetMonthlyViews();
+  /*   await resetMonthlyViews();    | runs on every slug not what I want */
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 
   res.status(200).send(article);
