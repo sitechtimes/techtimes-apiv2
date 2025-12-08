@@ -21,7 +21,7 @@ export interface DraftDoc extends mongoose.Document {
   customAuthor?: string;
   imageUrl: string;
   imageAlt: string;
-  editorResponses: string[];
+  editorResponses: Array<{"name": string, "text": string}>;
   status: DraftStatus;
   category: Category;
 }
@@ -62,7 +62,7 @@ const draftSchema = new mongoose.Schema(
       trim: true,
     },
     editorResponses: {
-      type: [Object.values(String)],
+      type: Array<{"name": string, "text": string}>,
       default: [],
       required: false,
     },
