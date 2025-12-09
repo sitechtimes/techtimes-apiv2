@@ -48,7 +48,7 @@ async function show(req: Request, res: Response) {
     { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
     { new: true }
   );
-  /*   await resetMonthlyViews();    | runs on every slug not what I want */
+  await resetMonthlyViews();
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 
   res.status(200).send(article);
