@@ -40,6 +40,11 @@ async function index(req: Request, res: Response) {
   res.status(200).send(response);
 }
 
+async function popular(req: Request, res: Response) {
+  const popularity = await Article.find().select("-content").sort({ viewCountTotal: -1 });
+  res.status(200).send(popularity);
+}
+
 async function show(req: Request, res: Response) {
   const { slug } = req.params;
 
@@ -48,10 +53,10 @@ async function show(req: Request, res: Response) {
     { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
     { new: true }
   );
-  await resetMonthlyViews();
+  await resetMonthlyViews(); // ts might have to be changed out somewhere else
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 
   res.status(200).send(article);
 }
 
-module.exports = { homepage, index, show };
+module.exports = { homepage, index, show, popular };
