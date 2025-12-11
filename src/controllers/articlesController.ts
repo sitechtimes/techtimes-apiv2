@@ -45,6 +45,11 @@ async function popular(req: Request, res: Response) {
   res.status(200).send(popularity);
 }
 
+async function trending(req: Request, res: Response) {
+  const trendy = await Article.find().select("-content").sort({ viewCountMonthly: -1 });
+  res.status(200).send(trendy);
+}
+
 async function show(req: Request, res: Response) {
   const { slug } = req.params;
 
@@ -59,4 +64,4 @@ async function show(req: Request, res: Response) {
   res.status(200).send(article);
 }
 
-module.exports = { homepage, index, show, popular };
+module.exports = { homepage, index, show, popular, trending };

@@ -49,12 +49,17 @@ const schemaDefinition = {
   },
   viewCountMonthly: {
     type: Number,
-    required: false /* Make true if I even get ts working */,
+    required: true,
     default: 0,
   },
   viewCountTotal: {
     type: Number,
-    required: false /* Make true if I even get ts working */,
+    required: true,
+    default: 0,
+  },
+  prevMonthTrendingRank: {
+    type: Number,
+    required: true,
     default: 0,
   },
 } as const;
