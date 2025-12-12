@@ -129,7 +129,6 @@ async function ready(req: Request, res: Response) {
 
 // get draft by id
 async function show(req: Request, res: Response) {
-
   const { id } = req.params;
   const draft = await Draft.findById(id);
 
@@ -191,7 +190,7 @@ async function update(req: Request, res: Response) {
     const editorResponses =
       req.body.editorResponses === undefined ? draft.editorResponses : req.body.editorResponses;
 
-    console.log(editorResponses)
+    console.log(editorResponses);
 
     draft.set({
       title,
@@ -206,13 +205,10 @@ async function update(req: Request, res: Response) {
   }
 
   // EDITOR/ADMIN - can move to ready and back to draft
-  if (
-    ([Role.Editor, Role.Admin].includes(req.currentUser.role as Role) && DraftStatus.Draft,
-    DraftStatus.Ready == req.body.status)
-  ) {
-    console.log("test");
+  if ([Role.Editor, Role.Admin].includes(req.currentUser.role as Role)) {
     draft.set({
       status: req.body.status,
+      editorResponses: req.body.editorResponses,
     });
   }
 
