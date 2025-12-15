@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Article } from "../models/article";
 import { SortOrder } from "mongoose";
 import { resetMonthlyViews } from "../utils/monthlyViewReset";
+import { test } from "../utils/trendingRankPrev";
 
 /** get 20 most recent articles */
 async function homepage(req: Request, res: Response) {
@@ -47,6 +48,7 @@ async function popular(req: Request, res: Response) {
 
 async function trending(req: Request, res: Response) {
   const trendy = await Article.find().select("-content").sort({ viewCountMonthly: -1 });
+  test()
   res.status(200).send(trendy);
 }
 
