@@ -190,8 +190,6 @@ async function update(req: Request, res: Response) {
     const editorResponses =
       req.body.editorResponses === undefined ? draft.editorResponses : req.body.editorResponses;
 
-    console.log(editorResponses);
-
     draft.set({
       title,
       content,
