@@ -1,8 +1,8 @@
 import { Article } from "../models/article";
 const { DateTime } = require("luxon");
 const currentDate = DateTime.now().toObject();
-var resetTime: boolean = false;
-var resetDone: boolean = false;
+let resetTime: boolean = false;
+let resetDone: boolean = false;
 
 function monthCheck() {
   const currentDay = currentDate.day;
@@ -25,12 +25,16 @@ function monthCheck() {
 }
 
 export async function resetMonthlyViews() {
-  if (!monthCheck()) return null;
-  try {
-    const result = await Article.updateMany({}, { $set: { viewCountMonthly: 0 } }).exec();
-    resetDone = true;
-    return result;
-  } catch (err) {
-    throw err;
+  monthCheck();
+  if (resetTime === false) {
+    return;
+  } else if (resetTime === true) {
+    try {
+      const result = await Article.updateMany({}, { $set: { viewCountMonthly: 0 } }).exec();
+      resetDone = true;
+      return result;
+    } catch (err) {
+      throw err;
+    }
   }
 }
