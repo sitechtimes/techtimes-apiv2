@@ -1,12 +1,12 @@
 import { Article } from "../models/article";
 const { DateTime } = require("luxon");
 const currentDate = DateTime.now().toObject();
-let resetTime: boolean = false;
-let resetDone: boolean = false;
+export let resetTime: boolean = false;
+export let resetDone: boolean = false;
+const resetDay: number = 1;
 
 function monthCheck() {
   const currentDay = currentDate.day;
-  const resetDay: number = 1;
   if (currentDay === resetDay && resetDone === false) {
     resetTime = true;
     return resetTime;
@@ -14,7 +14,6 @@ function monthCheck() {
     resetTime = false;
     return resetTime;
   } else if (currentDay !== resetDay) {
-    /* this whole function has to run every day then somewhere in order for the logic to work */
     resetDone = false;
     resetTime = false;
     return [resetTime, resetDone];
@@ -38,3 +37,5 @@ export async function resetMonthlyViews() {
     }
   }
 }
+
+/* Only for use in the trending endpoint to reset the views at the start of the month */

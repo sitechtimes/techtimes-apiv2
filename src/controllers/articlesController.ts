@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Article } from "../models/article";
 import { SortOrder } from "mongoose";
 import { resetMonthlyViews } from "../utils/monthlyViewReset";
-import { test } from "../utils/trendingRankPrev";
+import { test, newMonthRankings } from "../utils/trendingRankPrev";
 
 /** get 20 most recent articles */
 async function homepage(req: Request, res: Response) {
@@ -48,8 +48,8 @@ async function popular(req: Request, res: Response) {
 
 async function trending(req: Request, res: Response) {
   const trendy = await Article.find().select("-content").sort({ viewCountMonthly: -1 });
-  test()
-  res.status(200).send(trendy);
+  await test(trendy);
+  res.status(200).send(trendy); // need to test out if the function somhow returns the trendy instance from function or from here
 }
 
 async function show(req: Request, res: Response) {
@@ -60,7 +60,6 @@ async function show(req: Request, res: Response) {
     { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
     { new: true }
   );
-  await resetMonthlyViews(); // ts might have to be changed out somewhere else
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 
   res.status(200).send(article);
