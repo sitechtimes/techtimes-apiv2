@@ -5,6 +5,7 @@ const { DateTime } = require("luxon");
 const today = DateTime.now().toObject().day;
 // first make function to sort aticles by monthyltrending views
 // then based on that sorted list or whatever assign each article a rank
+// only sory by the prevmonthranking when it is the reset time/day
 
 export async function test(X?: object) {
   if (resetDone === false && today === resetDay) {
@@ -24,7 +25,6 @@ export async function test(X?: object) {
         console.log(trendy[i].title, trendy[i].viewCountMonthly, trendy[i].prevMonthTrendingRank);
       }
       await resetMonthlyViews();
-      // only sory by the prevmonthranking when it is the reset time/day
     }
   }
 
