@@ -47,9 +47,13 @@ async function popular(req: Request, res: Response) {
 }
 
 async function trending(req: Request, res: Response) {
-  const trendy = await Article.find().select("-content").sort({ viewCountMonthly: -1 });
-  await test(trendy);
-  res.status(200).send(trendy); // need to test out if the function somhow returns the trendy instance from function or from here
+  const trending_Articles = await Article.find()
+    .select("-content")
+    .sort({ viewCountMonthly: -1 })
+    .lean()
+    .exec();
+  await test(trending_Articles);
+  res.status(200).send(trending_Articles);
 }
 
 async function show(req: Request, res: Response) {

@@ -1,39 +1,33 @@
 import { Article } from "../models/article";
-import { resetTime, resetDone, resetDay, resetMonthlyViews } from "./monthlyViewReset";
+import { resetDone, resetDay, resetMonthlyViews } from "./monthlyViewReset";
 export let newMonthRankings = null;
 const { DateTime } = require("luxon");
 const today = DateTime.now().toObject().day;
-// first make function to sort aticles by monthyltrending views
-// then based on that sorted list or whatever assign each article a rank
-// only sory by the prevmonthranking when it is the reset time/day
 
-export async function test(X?: object) {
+export async function test(X?: any) {
   if (resetDone === false && today === resetDay) {
-    const trendy = await Article.find()
-      .select("-content")
-      .sort({ viewCountMonthly: -1 })
-      .lean()
-      .exec();
-
-    if (trendy.length) {
-      for (let i: number = 0; i < trendy.length; i++) {
+    console.log(X);
+    if (X.length) {
+      for (let i: number = 0; i < X.length; i++) {
         const rank: number = i + 1;
+        console.log(rank);
+
         await Article.updateOne(
-          { slug: trendy[i].slug },
+          { slug: X[i].slug },
           { $set: { prevMonthTrendingRank: rank } }
         ).exec();
-        console.log(trendy[i].title, trendy[i].viewCountMonthly, trendy[i].prevMonthTrendingRank);
       }
       await resetMonthlyViews();
     }
   }
 
   if (today === resetDay && resetDone === true) {
-    let X = await Article.find()
+    let Y = await Article.find()
       .select("-content")
       .sort({ prevMonthTrendingRank: 1 })
       .lean()
       .exec();
-    return X;
+
+    return Y;
   }
 }
