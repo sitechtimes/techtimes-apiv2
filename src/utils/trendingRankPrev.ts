@@ -9,9 +9,6 @@ export async function test(X?: any) {
     if (X.length) {
       for (let i: number = 0; i < X.length; i++) {
         const rank: number = i + 1;
-        console.log(rank);
-        console.log(X[i].slug);
-
         await Article.updateOne(
           { slug: X[i].slug },
           { $set: { prevMonthTrendingRank: rank } }
@@ -20,7 +17,6 @@ export async function test(X?: any) {
       await resetMonthlyViews();
     }
   }
-
   if (today === resetDay && resetDone === true) {
     let Y = await Article.find()
       .select("-content")
