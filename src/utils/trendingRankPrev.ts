@@ -2,15 +2,15 @@ import { Article } from "../models/article";
 import { resetDone, resetDay, resetMonthlyViews } from "./monthlyViewReset";
 export let newMonthRankings = null;
 const { DateTime } = require("luxon");
-const today = DateTime.now().toObject().day;
 
 export async function test(X?: any) {
+  const today = DateTime.now().toObject().day;
   if (resetDone === false && today === resetDay) {
-    console.log(X);
     if (X.length) {
       for (let i: number = 0; i < X.length; i++) {
         const rank: number = i + 1;
         console.log(rank);
+        console.log(X[i].slug);
 
         await Article.updateOne(
           { slug: X[i].slug },
