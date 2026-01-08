@@ -1,6 +1,6 @@
 import { Article } from "../models/article";
-import { resetDone, resetDay, resetMonthlyViews } from "./monthlyViewReset";
-export let newMonthRankings = null;
+import { resetDone, resetDay, resetMonthlyViews, resetSorting } from "./monthlyViewReset";
+export let newMonthRankings: unknown = null;
 const { DateTime } = require("luxon");
 
 export async function test(X?: any) {
@@ -15,17 +15,13 @@ export async function test(X?: any) {
         ).exec();
       }
       await resetMonthlyViews();
+      const Y = await Article.find()
+        .select("-content")
+        .sort({ prevMonthTrendingRank: 1 })
+        .lean()
+        .exec();
+      newMonthRankings = Y;
+      return newMonthRankings;
     }
-  }
-  if (today === resetDay && resetDone === true) {
-    let Y = await Article.find()
-      .select("-content")
-      .sort({ prevMonthTrendingRank: 1 })
-      .lean()
-      .exec();
-
-    return Y;
-
-    // make x = y and return it to so if it fixes?
   }
 }

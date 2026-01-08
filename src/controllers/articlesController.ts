@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Article } from "../models/article";
 import { SortOrder } from "mongoose";
-import { resetMonthlyViews } from "../utils/monthlyViewReset";
+import { resetTime, resetDone, resetSorting } from "../utils/monthlyViewReset";
 import { test, newMonthRankings } from "../utils/trendingRankPrev";
 
 /** get 20 most recent articles */
@@ -53,7 +53,12 @@ async function trending(req: Request, res: Response) {
     .lean()
     .exec();
   await test(trending_Articles);
-  res.status(200).send(trending_Articles);
+  if (resetTime === true && resetDone === true) {
+    // jUST for now the newmonths ranknings is the auto deafult for full day on reset day | fix in a bit
+    res.status(200).send(newMonthRankings);
+  } else {
+    res.status(200).send(trending_Articles);
+  }
 }
 
 async function show(req: Request, res: Response) {

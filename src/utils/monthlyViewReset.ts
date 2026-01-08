@@ -3,7 +3,8 @@ const { DateTime } = require("luxon");
 const currentDate = DateTime.now().toObject();
 export let resetTime: boolean = false;
 export let resetDone: boolean = false;
-export const resetDay: number = 1;
+export let resetSorting: number = 0;
+export const resetDay: number = 8;
 
 function monthCheck() {
   const currentDay = currentDate.day;
