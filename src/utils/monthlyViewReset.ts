@@ -4,7 +4,7 @@ const currentDate = DateTime.now().toObject();
 export let resetTime: boolean = false;
 export let resetDone: boolean = false;
 export let resetSorting: number = 0;
-export const resetDay: number = 8;
+export const resetDay: number = 9;
 
 function monthCheck() {
   const currentDay = currentDate.day;
@@ -17,11 +17,16 @@ function monthCheck() {
   } else if (currentDay !== resetDay) {
     resetDone = false;
     resetTime = false;
-    return [resetTime, resetDone];
+    resetSorting = 0;
+    return [resetTime, resetDone, resetSorting];
   } else {
     resetTime = false;
     return resetTime;
   }
+}
+
+export function resetSorted() {
+  return (resetSorting += 1);
 }
 
 export async function resetMonthlyViews() {
