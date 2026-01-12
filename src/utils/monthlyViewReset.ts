@@ -4,7 +4,7 @@ const currentDate = DateTime.now().toObject();
 export let resetTime: boolean = false;
 export let resetDone: boolean = false;
 export let resetSorting: number = 0;
-export const resetDay: number = 9;
+export const resetDay: number = 12;
 
 function monthCheck() {
   const currentDay = currentDate.day;

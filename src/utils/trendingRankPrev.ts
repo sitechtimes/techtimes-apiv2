@@ -1,9 +1,9 @@
 import { Article } from "../models/article";
-import { resetDone, resetDay, resetMonthlyViews, resetSorting } from "./monthlyViewReset";
+import { resetDone, resetDay, resetMonthlyViews } from "./monthlyViewReset";
 export let newMonthRankings: unknown = null;
 const { DateTime } = require("luxon");
 
-export async function test(X?: any) {
+export async function givePrevMonthOrder(X?: any) {
   const today = DateTime.now().toObject().day;
   if (resetDone === false && today === resetDay) {
     if (X.length) {
