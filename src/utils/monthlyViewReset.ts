@@ -4,7 +4,7 @@ const currentDate = DateTime.now().toObject();
 export let resetTime: boolean = false;
 export let resetDone: boolean = false;
 export let resetSorting: number = 0;
-export const resetDay: number = 12;
+export const resetDay: number = 1;
 
 function monthCheck() {
   const currentDay = currentDate.day;
@@ -44,4 +44,4 @@ export async function resetMonthlyViews() {
   }
 }
 
-/* Only for use in the trending endpoint to reset the views at the start of the month */
+/* Only for use in the trending endpoint */

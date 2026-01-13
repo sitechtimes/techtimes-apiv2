@@ -47,17 +47,17 @@ async function popular(req: Request, res: Response) {
 }
 
 async function trending(req: Request, res: Response) {
-  const trending_Articles = await Article.find()
+  const trendingArticles = await Article.find()
     .select("-content")
     .sort({ viewCountMonthly: -1 })
     .lean()
     .exec();
-  await givePrevMonthOrder(trending_Articles);
+  await givePrevMonthOrder(trendingArticles);
   if (resetTime === true && resetDone === true && resetSorting !== 1) {
     res.status(200).send(newMonthRankings);
     resetSorted();
   } else {
-    res.status(200).send(trending_Articles);
+    res.status(200).send(trendingArticles);
   }
 }
 
