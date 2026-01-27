@@ -4,6 +4,7 @@ const currentDate = DateTime.now().toObject();
 export let resetTime: boolean = false;
 export let resetDone: boolean = false;
 export let resetSorting: number = 0;
+// resetsorting detrmines if  it neeeds to rank the prev month articles by views. if 0 then yes, if 1 then it auto updates by monthlyViews.
 export const resetDay: number = 1;
 
 function monthCheck() {

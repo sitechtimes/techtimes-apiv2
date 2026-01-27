@@ -15,12 +15,12 @@ export async function givePrevMonthOrder(X?: any) {
         ).exec();
       }
       await resetMonthlyViews();
-      const Y = await Article.find()
+      const sortedRankings = await Article.find()
         .select("-content")
         .sort({ prevMonthTrendingRank: 1 })
         .lean()
         .exec();
-      newMonthRankings = Y;
+      newMonthRankings = sortedRankings;
       return newMonthRankings;
     }
   }
