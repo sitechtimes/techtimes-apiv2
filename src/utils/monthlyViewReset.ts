@@ -9,7 +9,7 @@ export const resetDay: number = 1;
 
 function monthCheck() {
   const currentDay = currentDate.day;
-  if (currentDay === resetDay && resetDone === false) {
+  if (currentDay === resetDay && !resetDone) {
     resetTime = true;
     return resetTime;
   } else if (currentDay === resetDay && resetDone === true) {
