@@ -53,7 +53,7 @@ async function trending(req: Request, res: Response) {
     .lean()
     .exec();
   await givePrevMonthOrder(trendingArticles);
-  if (resetTime === true && resetDone === true && resetSorting !== 1) {
+  if (resetTime && resetDone && resetSorting !== 1) {
     res.status(200).send(newMonthRankings);
     resetSorted();
   } else {
