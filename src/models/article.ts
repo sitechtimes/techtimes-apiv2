@@ -47,6 +47,21 @@ const schemaDefinition = {
   slug: {
     type: String,
   },
+  viewCountMonthly: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  viewCountTotal: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  prevMonthTrendingRank: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
 } as const;
 
 const articleSchema = new mongoose.Schema(schemaDefinition, {

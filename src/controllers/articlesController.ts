@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { Article } from "../models/article";
 import { SortOrder } from "mongoose";
+import { resetTime, resetDone, resetSorting, resetSorted } from "../utils/monthlyViewReset";
+import { givePrevMonthOrder, newMonthRankings } from "../utils/trendingRankPrev";
 
 /** get 20 most recent articles */
 async function homepage(req: Request, res: Response) {
@@ -39,14 +41,37 @@ async function index(req: Request, res: Response) {
   res.status(200).send(response);
 }
 
+async function popular(req: Request, res: Response) {
+  const popularity = await Article.find().select("-content").sort({ viewCountTotal: -1 });
+  res.status(200).send(popularity);
+}
+
+async function trending(req: Request, res: Response) {
+  const trendingArticles = await Article.find()
+    .select("-content")
+    .sort({ viewCountMonthly: -1 })
+    .lean()
+    .exec();
+  await givePrevMonthOrder(trendingArticles);
+  if (resetTime && resetDone && resetSorting !== 1) {
+    res.status(200).send(newMonthRankings);
+    resetSorted();
+  } else {
+    res.status(200).send(trendingArticles);
+  }
+}
+
 async function show(req: Request, res: Response) {
   const { slug } = req.params;
 
-  const article = await Article.findOne({ slug });
-
+  const article = await Article.findOneAndUpdate(
+    { slug },
+    { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
+    { new: true }
+  );
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 
   res.status(200).send(article);
 }
 
-module.exports = { homepage, index, show };
+module.exports = { homepage, index, show, popular, trending };
