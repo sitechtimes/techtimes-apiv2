@@ -3,7 +3,7 @@ import { resetDone, resetDay, resetMonthlyViews } from "./monthlyViewReset";
 export let newMonthRankings: unknown = null;
 const { DateTime } = require("luxon");
 
-export async function givePrevMonthOrder(X?: any) {
+export async function givePrevMonthOrder(X?: { slug: string }[]) {
   const today = DateTime.now().toObject().day;
   if (resetDone === false && today === resetDay) {
     if (X.length) {

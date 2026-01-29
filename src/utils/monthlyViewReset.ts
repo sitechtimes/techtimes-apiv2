@@ -9,20 +9,18 @@ export const resetDay: number = 1;
 
 function monthCheck() {
   const currentDay = currentDate.day;
-  if (currentDay === resetDay && !resetDone) {
-    resetTime = true;
+  if (currentDay === resetDay) {
+    if (!resetDone) {
+      resetTime = true;
+    } else {
+      resetTime = false;
+    }
     return resetTime;
-  } else if (currentDay === resetDay && resetDone === true) {
-    resetTime = false;
-    return resetTime;
-  } else if (currentDay !== resetDay) {
+  } else {
     resetDone = false;
     resetTime = false;
     resetSorting = 0;
     return [resetTime, resetDone, resetSorting];
-  } else {
-    resetTime = false;
-    return resetTime;
   }
 }
 
@@ -34,7 +32,7 @@ export async function resetMonthlyViews() {
   monthCheck();
   if (resetTime === false) {
     return;
-  } else if (resetTime === true) {
+  } else {
     try {
       const result = await Article.updateMany({}, { $set: { viewCountMonthly: 0 } }).exec();
       resetDone = true;
