@@ -6,12 +6,12 @@ const { DateTime } = require("luxon");
 export async function givePrevMonthOrder(X?: { slug: string }[]) {
   const today = DateTime.now().toObject().day;
   if (resetDone === false && today === resetDay) {
-    if (X.length) {
+    if (X && X.length) {
       for (let i: number = 0; i < X.length; i++) {
         const rank: number = i + 1;
         await Article.updateOne(
           { slug: X[i].slug },
-          { $set: { prevMonthTrendingRank: rank } }
+          { $set: { prevMonthTrendingRank: rank } },
         ).exec();
       }
       await resetMonthlyViews();

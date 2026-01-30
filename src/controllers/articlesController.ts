@@ -4,6 +4,26 @@ import { SortOrder } from "mongoose";
 import { resetTime, resetDone, resetSorting, resetSorted } from "../utils/monthlyViewReset";
 import { givePrevMonthOrder, newMonthRankings } from "../utils/trendingRankPrev";
 
+export type Article = {
+  title: string;
+  content: string;
+  customAuthor?: string;
+  user: {
+    id: string;
+    name: string;
+    imageUrl?: string;
+  };
+  imageUrl?: string;
+  imageAlt?: string;
+  category: string;
+  slug: string;
+  viewCountMonthly: number;
+  viewCountTotal: number;
+  prevMonthTrendingRank: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 /** get 20 most recent articles */
 async function homepage(req: Request, res: Response) {
   const homepages = await Article.find()
@@ -50,7 +70,7 @@ async function trending(req: Request, res: Response) {
   const trendingArticles = await Article.find()
     .select("-content")
     .sort({ viewCountMonthly: -1 })
-    .lean()
+    .lean<Article[]>()
     .exec();
   await givePrevMonthOrder(trendingArticles);
   if (resetTime && resetDone && resetSorting !== 1) {
@@ -67,7 +87,7 @@ async function show(req: Request, res: Response) {
   const article = await Article.findOneAndUpdate(
     { slug },
     { $inc: { viewCountMonthly: 1, viewCountTotal: 1 } },
-    { new: true }
+    { new: true },
   );
   if (!article) return res.status(404).json({ error: "ARTICLE_NOT_FOUND" });
 

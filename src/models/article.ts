@@ -46,6 +46,7 @@ const schemaDefinition = {
   },
   slug: {
     type: String,
+    required: true,
   },
   viewCountMonthly: {
     type: Number,
