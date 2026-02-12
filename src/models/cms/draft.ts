@@ -9,6 +9,7 @@ interface DraftAttrs {
   customAuthor?: string;
   imageUrl?: string;
   imageAlt?: string;
+  editorResponses?: string[];
   status?: DraftStatus;
   category?: Category;
 }
@@ -20,6 +21,7 @@ export interface DraftDoc extends mongoose.Document {
   customAuthor?: string;
   imageUrl: string;
   imageAlt: string;
+  editorResponses: Array<{"name": string, "text": string}>;
   status: DraftStatus;
   category: Category;
 }
@@ -59,6 +61,11 @@ const draftSchema = new mongoose.Schema(
       required: false,
       trim: true,
     },
+    editorResponses: {
+      type: Array<{"name": string, "text": string}>,
+      default: [],
+      required: false,
+    },
     status: {
       type: String,
       enum: Object.values(DraftStatus),
@@ -72,6 +79,9 @@ const draftSchema = new mongoose.Schema(
       default: Category.Technology,
     },
   },
+  {
+    timestamps: true,
+  }
 );
 
 // optional: add build function if you want

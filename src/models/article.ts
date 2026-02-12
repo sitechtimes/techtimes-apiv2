@@ -46,13 +46,29 @@ const schemaDefinition = {
   },
   slug: {
     type: String,
+    required: true,
+  },
+  viewCountMonthly: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  viewCountTotal: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  prevMonthTrendingRank: {
+    type: Number,
+    required: true,
+    default: 0,
   },
 } as const;
 
 const articleSchema = new mongoose.Schema(schemaDefinition, {
   timestamps: true,
   toJSON: {
-    transform(doc, ret) {
+    transform(doc, ret: any) {
       ret.id = ret._id;
       delete ret._id;
       delete ret.__v;

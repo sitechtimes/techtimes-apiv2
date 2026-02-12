@@ -159,7 +159,15 @@ async function update(req: Request, res: Response) {
 
     // these are required!!!! do not let them be empty!!
     const title = isEmpty(req.body.title) ? draft.title : sanitize(req.body.title);
-    const content = isEmpty(req.body.content) ? draft.content : sanitize(req.body.content);
+    const content = isEmpty(req.body.content)
+      ? draft.content
+      : sanitize(req.body.content, {
+          allowedTags: sanitize.defaults.allowedTags.concat(["img", "del"]),
+          allowedAttributes: {
+            span: ["style"],
+          },
+          allowedSchemes: sanitize.defaults.allowedSchemes.concat(["data", "http", "https"]),
+        });
     const customAuthor = isEmpty(req.body.customAuthor)
       ? draft.customAuthor
       : req.body.customAuthor;
@@ -178,16 +186,26 @@ async function update(req: Request, res: Response) {
     const imageUrl = req.body.imageUrl === undefined ? draft.imageUrl : req.body.imageUrl;
     const imageAlt = req.body.imageAlt === undefined ? draft.imageAlt : req.body.imageAlt;
 
-    draft.set({ title, content, customAuthor, status, imageUrl, imageAlt, category });
+    const editorResponses =
+      req.body.editorResponses === undefined ? draft.editorResponses : req.body.editorResponses;
+
+    draft.set({
+      title,
+      content,
+      customAuthor,
+      status,
+      editorResponses,
+      imageUrl,
+      imageAlt,
+      category,
+    });
   }
 
   // EDITOR/ADMIN - can move to ready and back to draft
-  if (
-    [Role.Editor, Role.Admin].includes(req.currentUser.role as Role) &&
-    [DraftStatus.Draft, DraftStatus.Review].includes(req.body.status)
-  ) {
+  if ([Role.Editor, Role.Admin].includes(req.currentUser.role as Role)) {
     draft.set({
       status: req.body.status,
+      editorResponses: req.body.editorResponses,
     });
   }
 
@@ -196,8 +214,15 @@ async function update(req: Request, res: Response) {
   } catch (error) {
     // catch invalid categories
     if (error instanceof mongoose.Error.ValidationError)
-      if (error.errors.category.kind === "enum" && error.errors.category.path === "category")
-        await forceValidCategory(draft.id);
+      if (error instanceof mongoose.Error.ValidationError) {
+        if (
+          error.errors.category &&
+          error.errors.category.kind === "enum" &&
+          error.errors.category.path === "category"
+        ) {
+          await forceValidCategory(draft.id);
+        }
+      }
   }
 
   res.send(draft);
