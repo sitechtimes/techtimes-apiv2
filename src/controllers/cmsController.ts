@@ -11,7 +11,6 @@ import sanitize from "sanitize-html";
 import { forceValidCategory } from "../utils/forceValidCategory";
 import { publishNetlify } from "../utils/publishNetlify";
 import { User } from "../models/user";
-import { getEffectiveTypeParameterDeclarations } from "typescript";
 
 // get categories
 async function categories(req: Request, res: Response) {
