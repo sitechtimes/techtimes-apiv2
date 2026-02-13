@@ -42,6 +42,11 @@ async function signIn(req: Request, res: Response) {
 
   const userJWT = jwt.sign(payload, process.env.JWT_KEY!, { expiresIn: "6h" });
 
+  req.session = {
+    jwt: userJWT,
+  };
+
+
   res.status(200).send({
     ...existingUser.toJSON(),
     token: userJWT,
@@ -49,6 +54,8 @@ async function signIn(req: Request, res: Response) {
 }
 
 async function logout(req: Request, res: Response) {
+  req.session = null;
+
   res.sendStatus(204);
 }
 
@@ -79,6 +86,10 @@ async function verify(req: Request, res: Response) {
   };
 
   const userJWT = jwt.sign(payload, process.env.JWT_KEY!, { expiresIn: "6h" });
+
+  req.session = {
+    jwt: userJWT,
+  };
 
   res.status(200).send({ ...user.toJSON(), token: userJWT });
 }

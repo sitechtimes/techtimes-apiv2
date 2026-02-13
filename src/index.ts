@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import { currentUser } from "./middleware/currentUser";
+import cookieSession from "cookie-session";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,6 +24,14 @@ app.use(
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+app.use(
+  cookieSession({
+    signed: true,
+    secret: process.env.COOKIE_KEY,
+    secure: false, // set this to true in prod. this needs https actually??
+  })
+);
 
 app.use(currentUser);
 
