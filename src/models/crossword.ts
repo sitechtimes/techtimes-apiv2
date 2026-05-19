@@ -19,7 +19,13 @@ const schemaDefinition = {
     required: true,
   },
   grid_size: {
+    // Size of the crossword grid, aka a square grid
     type: Number,
+    required: true,
+  },
+  date: {
+    //assigned to which date
+    type: Date,
     required: true,
   },
 };
