@@ -4,7 +4,9 @@ import { crossword } from "../models/crossword";
 async function createCrossword(req: Request, res: Response) {
   const crosswordData = req.body;
   try {
-    const existingCrossword = await crossword.findOne({ date: crosswordData.date });
+    const existingCrossword = await crossword.findOne({
+      date: crosswordData.date,
+    });
     if (existingCrossword)
       return res.status(400).json({ error: "Crossword for today already exists" });
 
@@ -17,7 +19,7 @@ async function createCrossword(req: Request, res: Response) {
 
 async function getCrosswordForToday(req: Request, res: Response) {
   try {
-    const today = new Date();
+    const today = new Date().toLocaleDateString();
     const crosswordForToday = await crossword.findOne({ date: today });
     if (!crosswordForToday) {
       return res.status(404).json({ error: "No crossword found for today" });
@@ -27,3 +29,5 @@ async function getCrosswordForToday(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to retrieve crossword" });
   }
 }
+
+// idk if we want to track history, but this is what it is
