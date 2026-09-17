@@ -27,10 +27,9 @@ const schemaDefinition = {
   // Clues for all words
   clues: {
     type: [{
-      number: { type: Number },
-      clue: { type: String },
-      direction: { type: String, enum: ['Across', 'Vertical']},
-      length : { type: Number },
+      number: { type: Number }, // Word
+      clue: { type: String }, // the actual Clue
+      direction: { type: String, enum: ['Across', 'Vertical']}, // Which word direction cuz word can share the same number
     }],
     required: true
   },
