@@ -1,32 +1,38 @@
 import mongoose from "mongoose";
 
 const schemaDefinition = {
-  word: {
+  title: {
     type: String,
     required: true,
   },
-  direction: {
-    type: String,
-    enum: ["across", "down"],
-    required: true,
-  },
-  position: {
-    type: [Number, Number],
-    required: true,
-  },
-  question: {
-    type: String,
-    required: true,
-  },
-  grid_size: {
-    // Size of the crossword grid, aka a square grid
+  gridSize: {
+    // Size of the crossword grid, aka a square grid so 10 means 10x10 grid
     type: Number,
     required: true,
   },
-  date: {
-    //assigned to which date
+  creationDate: {
+    // Data that it was created ( cuz its prob not gonna get updated daily )
     type: Date,
     required: true,
+  },
+  data: {
+    // This is gonna be where the actual data is
+    // It is going to look like
+    // [["null", "null", "null", "e"],
+    //  ["null", "null", "null", "a"]]
+    // so on and so forth
+    type: [[String]],
+    required: true
+  },
+  // Clues for all words
+  clues: {
+    type: [{
+      number: { type: Number },
+      clue: { type: String },
+      direction: { type: String, enum: ['Across', 'Vertical']},
+      length : { type: Number },
+    }],
+    required: true
   },
 };
 
