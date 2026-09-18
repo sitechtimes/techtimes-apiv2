@@ -6,5 +6,5 @@ import { roles } from "../utils/roles";
 
 const crosswordController = require("../controllers/crosswordController");
 
-router.post("/crosswords", requireAuth, roles([Role.Editor, Role.Admin]), crosswordController.createCrossword);
-router.get("/crosswords", crosswordController.getCrosswordForToday);
+router.post("/crosswords", requireAuth, crosswordController.createCrossword);
+router.get("/crosswords", crosswordController.getMostRecentCrossword);

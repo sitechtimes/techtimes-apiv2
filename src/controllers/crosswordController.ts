@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
-import { crossword } from "../models/crossword";
+import { crossword } from "../models/games/crossword";
+import { GamesStatus } from "../models/games/gamesStatus";
+import { Role } from "../models/role";
 
 async function createCrossword(req: Request, res: Response) {
   const crosswordData = req.body;
@@ -19,24 +21,49 @@ async function createCrossword(req: Request, res: Response) {
 }
 */
   try {
-    const newCrossword = await crossword.create(crosswordData);
+    const newCrossword = await crossword.create({
+      ...crosswordData,
+      user: { id: req.currentUser!.id },
+      status: GamesStatus.Draft});
     res.status(201).json(newCrossword);
   } catch (error) {
     res.status(500).json({ error: "Failed to create crossword" });
   }
+}
 
-async function getCrosswordForToday(req: Request, res: Response) {
+async function getMostRecentCrossword(req: Request, res: Response) {
   try {
-    const today = new Date().toLocaleDateString();
+    // const today = new Date().toLocaleDateString();
     // To Do: In the Future Edit this if tech times are going to create one daily
-    const mostRecent = await crossword.findOne({ date: -1 });
-    if (!mostRecent) {
-      return res.status(404).json({ error: "No crossword found" });
-    }
+    const mostRecent = await crossword
+      .findOne({ status: GamesStatus.Published})
+      .sort({ creationDate: -1 });
+    if (!mostRecent) return res.status(404).json({ error: "No crossword found" });
+
     res.status(200).json(mostRecent);
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve crossword" });
   }
 }
 
+async function gamesUnderReview(req: Request, res:Response) {
+  const crosswords = await crossword.find({ status: GamesStatus.Review });
+  res.send(crosswords);
+}
+
+async function gamesStatusUpdate(req: Request, res:Response) {
+  const crosswordToUpdate = await crossword.findById(req.params.id);
+  if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" });
+  if (crosswordToUpdate.userId === req.currentUser!.id) {
+    const status = req.body.status === GamesStatus.Review ? GamesStatus.Draft : GamesStatus.Review;
+    crosswordToUpdate.set{{ status: req.body.status }};
+  }
+  if (req.currentUser!.role === Role.Admin) {
+    if (req.body.status === GamesStatus.Draft|| req.body.status === GamesStatus.Review) {
+      crosswordToUpdate.set{{ status: req.body.status }}
+    }
+  }
+  await crosswordToUpdate.save();
+  res.send(crosswordToUpdate);
+}
 // idk if we want to track history, but this is what it is
