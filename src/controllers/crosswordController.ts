@@ -24,10 +24,10 @@ async function createCrossword(req: Request, res: Response) {
     const newCrossword = await crossword.create({
       ...crosswordData,
       user: { id: req.currentUser!.id },
-      status: GamesStatus.Draft});
+      status: GamesStatus.Draft });
     res.status(201).json(newCrossword);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create crossword" });
+    res.status(500).json({ error: "Failed to Create Crossword" });
   }
 }
 
@@ -36,7 +36,7 @@ async function getMostRecentCrossword(req: Request, res: Response) {
     // const today = new Date().toLocaleDateString();
     // To Do: In the Future Edit this if tech times are going to create one daily
     const mostRecent = await crossword
-      .findOne({ status: GamesStatus.Published})
+      .findOne({ status: GamesStatus.Published })
       .sort({ creationDate: -1 });
     if (!mostRecent) return res.status(404).json({ error: "No crossword found" });
 
@@ -46,24 +46,29 @@ async function getMostRecentCrossword(req: Request, res: Response) {
   }
 }
 
-async function gamesUnderReview(req: Request, res:Response) {
+async function crosswordUnderReview(req: Request, res:Response) {
   const crosswords = await crossword.find({ status: GamesStatus.Review });
+  if (!crosswords) return res.status(404).json({ error: "No crossword found" })
   res.send(crosswords);
 }
 
-async function gamesStatusUpdate(req: Request, res:Response) {
+async function crosswordStatusUpdate(req: Request, res:Response) {
   const crosswordToUpdate = await crossword.findById(req.params.id);
   if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" });
-  if (crosswordToUpdate.userId === req.currentUser!.id) {
-    const status = req.body.status === GamesStatus.Review ? GamesStatus.Draft : GamesStatus.Review;
-    crosswordToUpdate.set{{ status: req.body.status }};
+  if (crosswordToUpdate.user!.id === req.currentUser!.id) {
+    const status = req.body.status === GamesStatus.Review ? GamesStatus.Review : GamesStatus.Draft;
+    crosswordToUpdate.set({ status: status });
   }
   if (req.currentUser!.role === Role.Admin) {
     if (req.body.status === GamesStatus.Draft|| req.body.status === GamesStatus.Review) {
-      crosswordToUpdate.set{{ status: req.body.status }}
+      crosswordToUpdate.set({ status: req.body.status });
     }
   }
+
+  
   await crosswordToUpdate.save();
   res.send(crosswordToUpdate);
 }
+
+module.exports = { createCrossword, getMostRecentCrossword, crosswordUnderReview, crosswordStatusUpdate, }
 // idk if we want to track history, but this is what it is

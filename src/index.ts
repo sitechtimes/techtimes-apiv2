@@ -42,6 +42,8 @@ const cmsRoutes = require("./routes/cms");
 app.use("/cms", cmsRoutes);
 const userRoutes = require("./routes/users");
 app.use("/users", userRoutes);
+const gameRoutes = require("./routes/games");
+app.use("/games", gameRoutes);
 
 mongoose.connect(process.env.MONGO_URI ?? "").catch((err) => {
   console.error("mongo exploded! do you have .env? ", err);

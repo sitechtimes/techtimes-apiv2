@@ -15,6 +15,7 @@ const schemaDefinition = {
     // Data that it was created ( cuz its prob not gonna:w get updated daily )
     type: Date,
     required: true,
+    default: Date.now()
   },
   data: {
     // This is gonna be where the actual data is
@@ -31,7 +32,8 @@ const schemaDefinition = {
       number: { type: Number }, // Word
       clue: { type: String }, // the actual Clue
       direction: { type: String, enum: ['Across', 'Vertical']}, // Which word direction cuz word can share the same number
-    }],
+    }]
+  },
   user: {
     id: {
       type: String,
@@ -52,9 +54,8 @@ const schemaDefinition = {
     required: true,
     default: GamesStatus.Draft,
   },
-  required: true,
-  },
 };
+
 
 const crosswordSchema = new mongoose.Schema(schemaDefinition);
 
