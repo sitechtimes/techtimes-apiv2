@@ -58,11 +58,9 @@ async function crosswordStatusUpdate(req: Request, res:Response) {
   if (crosswordToUpdate.user!.id === req.currentUser!.id) {
     const status = req.body.status === GamesStatus.Review ? GamesStatus.Review : GamesStatus.Draft;
     crosswordToUpdate.set({ status: status });
-  }
-  if (req.currentUser!.role === Role.Admin) {
-    if (req.body.status === GamesStatus.Draft|| req.body.status === GamesStatus.Review) {
-      crosswordToUpdate.set({ status: req.body.status });
-    }
+  }  
+  if (req.currentUser!.role === Role.Admin || req.currentUser!.role === Role.Editor) {
+    crosswordToUpdate.set({ status: req.body.status });
   }
 
   
@@ -70,5 +68,5 @@ async function crosswordStatusUpdate(req: Request, res:Response) {
   res.send(crosswordToUpdate);
 }
 
-module.exports = { createCrossword, getMostRecentCrossword, crosswordUnderReview, crosswordStatusUpdate, }
+module.exports = { createCrossword, getMostRecentCrossword, crosswordUnderReview, crosswordStatusUpdate }
 // idk if we want to track history, but this is what it is

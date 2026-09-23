@@ -8,5 +8,6 @@ const crosswordController = require("../controllers/crosswordController");
 
 router.post("/crosswords", requireAuth, crosswordController.createCrossword);
 router.get("/crosswords", crosswordController.getMostRecentCrossword);
-
-module.exports = router
+router.get("/crosswords/review", requireAuth, roles([Role.Editor, Role.Admin]), crosswordController.crosswordUnderReview);
+router.put("/crosswords/update-status", requireAuth, crosswordController.crosswordStatusUpdate)
+module.exports = router;
