@@ -71,5 +71,40 @@ async function crosswordStatusUpdate(req: Request, res:Response) {
   res.send(crosswordToUpdate);
 }
 
-module.exports = { createCrossword, getMostRecentCrossword, crosswordUnderReview, crosswordStatusUpdate }
+async function crosswordDataUpdate(req: Request, res: Response) {
+  const crosswordToUpdate = await crossword.findById(req.params.id);
+  if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" })
+  
+  // These two functions are spagetti code but who cares it works
+
+  if (crosswordToUpdate.user!.id === req.currentUser!.id && req.currentUser!.role === Role.Writer) {
+    crosswordToUpdate.set({ data: req.body.data });
+  } else if (req.currentUser!.role === Role.Editor || req.currentUser!.role === Role.Admin) {
+    crosswordToUpdate.set({ data: req.body.data });
+  } else {
+      return res.status(403).json({ error: "Forbidden"});
+  }
+
+  
+  await crosswordToUpdate.save();
+  res.send(crosswordToUpdate);
+}
+
+async function crosswordDelete(req: Request, res: Response) {
+  const crosswordToDelete = await crossword.findById(req.params.id);
+  if (!crosswordToDelete) return res.status(404).json({ error: "No crossword found" })
+
+  if (crosswordToDelete.user!.id === req.currentUser!.id && req.currentUser!.role === Role.Writer) {
+    crosswordToDelete.deleteOne();
+  } else if (req.currentUser!.role === Role.Editor || req.currentUser!.role === Role.Admin) {
+    crosswordToDelete.deleteOne();
+  } else {
+      return res.status(403).json({ error: "Forbidden"});
+  }
+  
+  res.send(crosswordToDelete);
+
+}
+
+module.exports = { createCrossword, getMostRecentCrossword, crosswordUnderReview, crosswordStatusUpdate, crosswordDataUpdate, crosswordDelete }
 // idk if we want to track history, but this is what it is
