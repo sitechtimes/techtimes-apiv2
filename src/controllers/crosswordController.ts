@@ -54,13 +54,16 @@ async function crosswordUnderReview(req: Request, res:Response) {
 
 async function crosswordStatusUpdate(req: Request, res:Response) {
   const crosswordToUpdate = await crossword.findById(req.params.id);
-  if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" });
-  if (crosswordToUpdate.user!.id === req.currentUser!.id) {
-    const status = req.body.status === GamesStatus.Review ? GamesStatus.Review : GamesStatus.Draft;
+  if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" })
+
+  if (crosswordToUpdate.user!.id === req.currentUser!.id && req.currentUser!.role === Role.Writer) {
+    const status = crosswordToUpdate.status === GamesStatus.Review ? GamesStatus.Draft : GamesStatus.Review;
     crosswordToUpdate.set({ status: status });
-  }  
-  if (req.currentUser!.role === Role.Admin || req.currentUser!.role === Role.Editor) {
-    crosswordToUpdate.set({ status: req.body.status });
+  } else if (req.currentUser!.role === Role.Editor || req.currentUser!.role === Role.Admin) {
+    const status = crosswordToUpdate.status === GamesStatus.Draft ? GamesStatus.Published : GamesStatus.Draft;
+    crosswordToUpdate.set({ status: status });
+  } else {
+      return res.status(403).json({ error: "Forbidden"});
   }
 
   
