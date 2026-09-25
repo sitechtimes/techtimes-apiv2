@@ -95,13 +95,14 @@ async function crosswordDelete(req: Request, res: Response) {
   if (!crosswordToDelete) return res.status(404).json({ error: "No crossword found" })
 
   if (crosswordToDelete.user!.id === req.currentUser!.id && req.currentUser!.role === Role.Writer) {
-    crosswordToDelete.deleteOne();
+    await crosswordToDelete.deleteOne();
   } else if (req.currentUser!.role === Role.Editor || req.currentUser!.role === Role.Admin) {
-    crosswordToDelete.deleteOne();
+    await crosswordToDelete.deleteOne();
   } else {
       return res.status(403).json({ error: "Forbidden"});
   }
   
+
   res.send(crosswordToDelete);
 
 }
