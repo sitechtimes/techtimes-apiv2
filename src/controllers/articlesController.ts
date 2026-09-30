@@ -14,7 +14,8 @@ async function homepage(req: Request, res: Response) {
   const homepages = await Article.find()
     .select("-content")
     .sort({ updatedAt: "descending" })
-    .limit(20);
+    .limit(20)
+    .populate("user", "name imageUrl");
 
   res.status(200).send(homepages);
 }
@@ -33,7 +34,11 @@ async function index(req: Request, res: Response) {
   const articles = await Article.find(query)
     .sort(sortBy)
     .skip(Number(req.query.skip) ?? 0)
-    .limit(limit + 1);
+    .limit(limit + 1)
+
+    // Maybe To Do : remove this if the front end
+    // doesn't use this part of the res
+    .populate("user", "name imageUrl");
   const isMore = articles.length > limit;
   if (isMore) articles.pop();
 
@@ -47,8 +52,8 @@ async function index(req: Request, res: Response) {
 
 async function show(req: Request, res: Response) {
   const { slug } = req.params;
-
-  const article = await Article.findOne({ slug });
+                                                // Same Comment from above
+  const article = await Article.findOne({ slug }).populate("user", "name imageUrl");
 
   if (!article) return res.status(404).json({ message: "article not found" });
 

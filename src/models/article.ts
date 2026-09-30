@@ -18,18 +18,9 @@ const schemaDefinition = {
     trim: true,
   },
   user: {
-    id: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    imageUrl: {
-      type: String,
-      required: false,
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
   imageUrl: {
     type: String,
