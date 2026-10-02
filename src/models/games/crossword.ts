@@ -35,18 +35,9 @@ const schemaDefinition = {
     }]
   },
   user: {
-    id: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: false,
-    },
-    imageUrl: {
-      type: String,
-      required: false,
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
   status: {
     type: String,
