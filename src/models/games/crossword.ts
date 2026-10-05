@@ -50,6 +50,6 @@ const schemaDefinition = {
 
 const crosswordSchema = new mongoose.Schema(schemaDefinition);
 
-const crossword = mongoose.model("Crossword", crosswordSchema);
+const Crossword = mongoose.model("Crossword", crosswordSchema);
 
-export { crossword };
+export { Crossword };

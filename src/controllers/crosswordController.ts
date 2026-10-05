@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { crossword } from "../models/games/crossword";
+import { Crossword } from "../models/games/crossword";
 import { GamesStatus } from "../models/games/gamesStatus";
 import { Role } from "../models/role";
 
@@ -21,7 +21,7 @@ async function createCrossword(req: Request, res: Response) {
 }
 */
   try {
-    const newCrossword = await crossword.create({
+    const newCrossword = await Crossword.create({
       ...crosswordData,
       user: req.currentUser!.id,
       status: GamesStatus.Draft });
@@ -35,7 +35,7 @@ async function getMostRecentCrossword(req: Request, res: Response) {
   try {
     // const today = new Date().toLocaleDateString();
     // To Do: In the Future Edit this if tech times are going to create one daily
-    const mostRecent = await crossword
+    const mostRecent = await Crossword
       .findOne({ status: GamesStatus.Published })
       .sort({ creationDate: -1 })
       .populate("user", "name imageUrl");
@@ -48,13 +48,13 @@ async function getMostRecentCrossword(req: Request, res: Response) {
 }
 
 async function crosswordUnderReview(req: Request, res:Response) {
-  const crosswords = await crossword.find({ status: GamesStatus.Review }).populate("user", "name imageUrl");
+  const crosswords = await Crossword.find({ status: GamesStatus.Review }).populate("user", "name imageUrl");
   if (!crosswords) return res.status(404).json({ error: "No crossword found" })
   res.send(crosswords);
 }
 
 async function crosswordStatusUpdate(req: Request, res:Response) {
-  const crosswordToUpdate = await crossword.findById(req.params.id);
+  const crosswordToUpdate = await Crossword.findById(req.params.id);
   if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" })
 
   if (crosswordToUpdate.user!.equals(req.currentUser!.id) && req.currentUser!.role === Role.Writer) {
@@ -73,7 +73,7 @@ async function crosswordStatusUpdate(req: Request, res:Response) {
 }
 
 async function crosswordDataUpdate(req: Request, res: Response) {
-  const crosswordToUpdate = await crossword.findById(req.params.id);
+  const crosswordToUpdate = await Crossword.findById(req.params.id);
   if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" })
   
   // These two functions are spagetti code but who cares it works
@@ -90,7 +90,7 @@ async function crosswordDataUpdate(req: Request, res: Response) {
 }
 
 async function crosswordDelete(req: Request, res: Response) {
-  const crosswordToDelete = await crossword.findById(req.params.id);
+  const crosswordToDelete = await Crossword.findById(req.params.id);
   if (!crosswordToDelete) return res.status(404).json({ error: "No crossword found" })
 
   if (crosswordToDelete.user!.equals(req.currentUser!.id) && req.currentUser!.role === Role.Writer) {
