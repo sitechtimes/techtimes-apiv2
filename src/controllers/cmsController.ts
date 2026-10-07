@@ -23,7 +23,7 @@ async function deleteArticle(req: Request, res: Response) {
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
-  if (draft.userId !== req.currentUser!.id)
+  if (!draft.userId!.equals(req.currentUser!.id))
     return res.status(401).json({ message: "Unauthorized" });
 
   res.sendStatus(204);
@@ -65,11 +65,7 @@ async function publish(req: Request, res: Response) {
     imageUrl: draft.imageUrl,
     imageAlt: draft.imageAlt,
     category: draft.category,
-    user: {
-      id: draft.userId,
-      name: user.name,
-      imageUrl: user.imageUrl,
-    },
+    user: draft.userId, 
   };
 
   const article = await Article.create(attrs);
@@ -130,7 +126,7 @@ async function show(req: Request, res: Response) {
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
-  if (draft.userId !== req.currentUser!.id && req.currentUser!.role === Role.Writer) {
+  if (!(draft.userId!.equals(req.currentUser!.id)) && req.currentUser!.role === Role.Writer) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -142,11 +138,11 @@ async function update(req: Request, res: Response) {
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
-  if (draft.userId !== req.currentUser!.id && req.currentUser!.role === Role.Writer)
+  if (!(draft.userId!.equals(req.currentUser!.id)) && req.currentUser!.role === Role.Writer)
     return res.status(401).json({ message: "Unauthorized" });
 
   // draft - for writer
-  if (draft.userId == req.currentUser!.id) {
+  if (!(draft.userId!.equals(req.currentUser!.id))) {
     // TODO - refactor update logic
     function isEmpty(thing: any) {
       return String(thing).trim().length === 0;
