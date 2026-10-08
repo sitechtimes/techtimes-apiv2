@@ -35,18 +35,9 @@ const schemaDefinition = {
     }]
   },
   user: {
-    id: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: false,
-    },
-    imageUrl: {
-      type: String,
-      required: false,
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
   status: {
     type: String,
@@ -59,6 +50,6 @@ const schemaDefinition = {
 
 const crosswordSchema = new mongoose.Schema(schemaDefinition);
 
-const crossword = mongoose.model("Crossword", crosswordSchema);
+const Crossword = mongoose.model("Crossword", crosswordSchema);
 
-export { crossword };
+export { Crossword };
