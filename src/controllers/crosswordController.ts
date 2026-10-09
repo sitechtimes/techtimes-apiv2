@@ -67,7 +67,7 @@ async function crosswordStatusUpdate(req: Request, res:Response) {
     };
     crosswordToUpdate.set({ status: status });
   } else {
-      return res.status(401).json({ error: "Forbidden" });
+      return res.status(403).json({ error: "Forbidden" });
   }
   await crosswordToUpdate.save();
   res.status(200).json(await crosswordToUpdate.populate("user", "name imageUrl"));
@@ -82,7 +82,7 @@ async function crosswordDataUpdate(req: Request, res: Response) {
   if (crosswordToUpdate.user!.equals(req.currentUser!.id) && req.currentUser!.role === Role.Writer) {
     crosswordToUpdate.set({ data: req.body.data });
   } else {
-      return res.status(401).json({ error: "Forbidden"});
+      return res.status(403).json({ error: "Forbidden"});
   }
 
   
@@ -99,7 +99,7 @@ async function crosswordDelete(req: Request, res: Response) {
   } else if (req.currentUser!.role === Role.Editor || req.currentUser!.role === Role.Admin) {
     await crosswordToDelete.deleteOne();
   } else {
-      return res.status(401).json({ error: "Forbidden"});
+      return res.status(403).json({ error: "Forbidden"});
   }
   
 
