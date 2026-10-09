@@ -49,7 +49,6 @@ async function getMostRecentCrossword(req: Request, res: Response) {
 
 async function crosswordUnderReview(req: Request, res:Response) {
   const crosswords = await Crossword.find({ status: GamesStatus.Review }).populate("user", "name imageUrl");
-  if (crosswords.length === 0) return res.status(204)
   res.status(200).json(crosswords);
 }
 
