@@ -76,11 +76,18 @@ async function crosswordStatusUpdate(req: Request, res:Response) {
 async function crosswordDataUpdate(req: Request, res: Response) {
   const crosswordToUpdate = await Crossword.findById(req.params.id);
   if (!crosswordToUpdate) return res.status(404).json({ error: "No crossword found" })
-  
-  // These two functions are spagetti code but who cares it works
 
+  const { gridSize, data, clues } = req.body;
+  const updates: Record<string, unknown> = {};
+  if (gridSize !== undefined) updates.gridSize = gridSize;
+  if (data !== undefined) updates.data = data;
+  if (clues !== undefined) updates.clues = clues;
+  
+  if (Object.keys(updates).length === 0) return res.status(400).json({ error: "provide a field" });
+  // These two functions are spagetti code but who cares it works
+  
   if (crosswordToUpdate.user!.equals(req.currentUser!.id) && req.currentUser!.role === Role.Writer) {
-    crosswordToUpdate.set({ data: req.body.data });
+    crosswordToUpdate.set(updates);
   } else {
       return res.status(403).json({ error: "Forbidden"});
   }
