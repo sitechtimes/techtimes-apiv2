@@ -19,13 +19,13 @@ async function categories(req: Request, res: Response) {
 }
 
 async function deleteArticle(req: Request, res: Response) {
-  const draft = await Draft.findByIdAndDelete(req.params.id);
+  const draft = await Draft.findById(req.params.id);
 
   if (!draft) return res.status(404).json({ message: "draft not found" });
 
   if (!draft.userId!.equals(req.currentUser!.id))
     return res.status(401).json({ message: "Unauthorized" });
-
+  await Draft.deleteOne();
   res.sendStatus(204);
 }
 
