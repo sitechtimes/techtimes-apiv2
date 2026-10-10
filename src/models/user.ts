@@ -29,13 +29,11 @@ const userSchema = new mongoose.Schema(schemaDefinition, {
   },
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   const hashed = await bcrypt.hash(this.get("password").trim(), 10);
   this.password = hashed;
-
-  next();
 });
 
 const User = mongoose.model("User", userSchema);

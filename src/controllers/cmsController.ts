@@ -68,7 +68,7 @@ async function publish(req: Request, res: Response) {
     user: draft.userId, 
   };
 
-  const article = await Article.create(attrs);
+  const article = new Article(attrs);
   // express validates stuff in a pre-save hook
   // catch invalid categories
   try {
