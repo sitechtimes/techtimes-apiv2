@@ -1,6 +1,6 @@
 import "dotenv/config";
 import cors from "cors";
-import express from "express";
+import express, { ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
 import { currentUser } from "./middleware/currentUser";
@@ -24,6 +24,14 @@ app.use(
 
 app.use(express.json());
 
+// fix: express v5 makes empty req undefined
+// instead of {} in v4
+// so band-aid fix to handle empty req
+app.use((req, _res, next) => {
+  req.body ??= {};
+  next();
+});
+
 app.use(
   cookieSession({
     signed: true,
@@ -44,6 +52,13 @@ const userRoutes = require("./routes/users");
 app.use("/users", userRoutes);
 const gameRoutes = require("./routes/games");
 app.use("/games", gameRoutes);
+
+// general error handling
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  console.error(err);
+  res.status(err.status ?? err.statusCode ?? 500).json({ message: "Uh Oh! *explodes*" });
+};
+
 
 mongoose.connect(process.env.MONGO_URI ?? "").catch((err) => {
   console.error("mongo exploded! do you have .env? ", err);
