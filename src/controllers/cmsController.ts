@@ -25,7 +25,7 @@ async function deleteArticle(req: Request, res: Response) {
 
   if (!draft.userId!.equals(req.currentUser!.id))
     return res.status(401).json({ message: "Unauthorized" });
-  await Draft.deleteOne();
+  await draft.deleteOne();
   res.sendStatus(204);
 }
 
