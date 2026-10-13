@@ -116,8 +116,8 @@ async function logout(req: Request, res: Response) {
 }
 
 async function verify(req: Request, res: Response) {
-  const { token } = req.params;
-
+  const { token } = req.params as { token: string };  
+  
   let user = await User.findOne({ verificationCode: token });
 
   if (!user) return res.status(401).json({ message: "Invalid token" });
