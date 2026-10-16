@@ -11,12 +11,6 @@ const schemaDefinition = {
     type: Number,
     required: true,
   },
-  creationDate: {
-    // Data that it was created ( cuz its prob not gonna:w get updated daily )
-    type: Date,
-    required: true,
-    default: Date.now()
-  },
   data: {
     // This is gonna be where the actual data is
     // It is going to look like
@@ -48,7 +42,18 @@ const schemaDefinition = {
 };
 
 
-const crosswordSchema = new mongoose.Schema(schemaDefinition);
+const crosswordSchema = new mongoose.Schema(schemaDefinition, {
+  timestamps: true,
+  toJSON: {
+    transform(doc, ret: any, options) {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+    },
+
+  },
+
+});
 
 const Crossword = mongoose.model("Crossword", crosswordSchema);
 

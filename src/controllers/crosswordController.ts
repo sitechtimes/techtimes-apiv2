@@ -7,7 +7,7 @@ async function createCrossword(req: Request, res: Response) {
   const crosswordData = req.body;
   // Uncomment This line if they are going to do a daily puzzle
 /*  try {
-    const existingCrossword = await crossword.findOne({
+    const existingCrossword = await Crossword.findOne({
       date: crosswordData.date,
     });
     if (existingCrossword)
